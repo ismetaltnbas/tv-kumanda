@@ -39,7 +39,7 @@ Tizen Studio'nun kurulduğu klasördeki `tools/ide/bin` içinde bir terminal aç
 tizen package -t wgt -s ekranim -- C:\yol\tizen-app
 sdb connect 192.168.1.102
 sdb devices
-tizen install -n C:\yol\tizen-app\Ekranım.wgt -t <sdb devices'ta görünen ad>
+tizen install -n <tizen-app klasöründe oluşan .wgt dosyası> -t <sdb devices'ta görünen ad>
 ```
 
 (Mac'te yollar `/Users/.../tizen-app` şeklinde olur.)
