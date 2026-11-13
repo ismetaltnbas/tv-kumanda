@@ -1,7 +1,7 @@
 # Ekranım — monitöre kurulum
 
 Samsung monitörün (LS43BM700UPXUF) üzerinde çalışan özel ana ekran uygulaması:
-temalar (Sihir, Gece, Kutup ışığı, Okyanus, Gün batımı, Orman), büyük saat,
+temalar (Sihir, Aslan, Yılan, Kartal, Porsuk, Gece, Kutup ışığı, Okyanus, Gün batımı, Orman; büyülü temalarda süzülen mumlar ve günün sözü), büyük saat,
 hava durumu, favori uygulamalar, tüm uygulamalar listesi ve ekran koruyucu.
 
 Kurulum bir kez yapılır, yaklaşık 30 dakika sürer. **Windows ya da Mac bilgisayar gerekir.**

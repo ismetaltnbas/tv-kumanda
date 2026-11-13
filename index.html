@@ -21,21 +21,30 @@
   [data-tema="okyanus"]{--bg:#06141f;--p:#0c2131;--b:#123048;--l:#1a3d58;--t:#e6f4ff;--m:#82a6bf}
   [data-tema="gunbatimi"]{--bg:#1a0f14;--p:#26161d;--b:#331d27;--l:#432634;--t:#fff0f3;--m:#c49aa8}
   [data-tema="orman"]{--bg:#0c1410;--p:#132019;--b:#1a2c22;--l:#24392d;--t:#ecf7f0;--m:#8fae9b}
-  [data-tema="sihir"]{--bg:#140a0d;--p:#24110f;--b:#33181a;--l:#6b4a2b;--t:#f3e6c4;--m:#c2a77a}
-  [data-tema="sihir"] body{background:
+  [data-tema="sihir"]{--bg:#140a0d;--p:#24110f;--b:#33181a;--l:#6b4a2b;--t:#f3e6c4;--m:#c2a77a;--altin:#e8c66a;--kenar:#7a5631;--kart1:#2c1512;--kart2:#1d0d0c;--isik1:#5c1a22;--isik2:#2a1a05;--kivilcim:#f6dc8a}
+  [data-tema="aslan"]{--bg:#16070a;--p:#2a0d10;--b:#3a1216;--l:#7a2a22;--t:#fbe9c8;--m:#d6a77a;--altin:#f2c14e;--kenar:#9a3a26;--kart1:#3a1014;--kart2:#1e070a;--isik1:#8e1b24;--isik2:#5a3a08;--kivilcim:#ffcf5a}
+  [data-tema="yilan"]{--bg:#06110c;--p:#0d1f17;--b:#132a20;--l:#2f5a46;--t:#e6efe9;--m:#9fb8ab;--altin:#d5dfe2;--kenar:#3f6b55;--kart1:#10261c;--kart2:#08140f;--isik1:#1a5a3a;--isik2:#24343a;--kivilcim:#dfeee8}
+  [data-tema="kartal"]{--bg:#070b18;--p:#0f1630;--b:#16203f;--l:#3a4a7a;--t:#e8ecf8;--m:#a3acc8;--altin:#d39a62;--kenar:#4a5a8a;--kart1:#121c3c;--kart2:#0a1022;--isik1:#1e2f6e;--isik2:#4a2f14;--kivilcim:#e8b884}
+  [data-tema="porsuk"]{--bg:#0f0d06;--p:#1f1a0b;--b:#2a2410;--l:#6a5a1e;--t:#fff6d8;--m:#cdbd8a;--altin:#f5d142;--kenar:#7a6a24;--kart1:#272010;--kart2:#14110a;--isik1:#5a4a0a;--isik2:#2a2a2a;--kivilcim:#ffe066}
+  .buyulu body{background:
     radial-gradient(1.2px 1.2px at 25px 40px,#fff9,transparent),radial-gradient(1px 1px at 120px 90px,#fff7,transparent),
-    radial-gradient(1.5px 1.5px at 170px 20px,#ffe9a8,transparent),radial-gradient(1px 1px at 60px 160px,#fff6,transparent),
+    radial-gradient(1.5px 1.5px at 170px 20px,var(--kivilcim),transparent),radial-gradient(1px 1px at 60px 160px,#fff6,transparent),
     radial-gradient(1px 1px at 190px 140px,#fff8,transparent);background-size:210px 190px;background-color:var(--bg)}
-  [data-tema="sihir"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:radial-gradient(ellipse at 50% -10%,#5c1a22 0%,transparent 60%),radial-gradient(ellipse at 50% 120%,#2a1a05 0%,transparent 55%)}
-  [data-tema="sihir"] h1,[data-tema="sihir"] .k h2,[data-tema="sihir"] nav button,[data-tema="sihir"] .dpad .ok{font-family:Cinzel,Georgia,serif;letter-spacing:.5px}
-  [data-tema="sihir"] h1{color:#e8c66a;text-shadow:0 0 12px #d3a62566}
-  [data-tema="sihir"] .k{background:linear-gradient(160deg,#2c1512,#1d0d0c);border-color:#7a5631;box-shadow:inset 0 0 0 1px #d3a62522,0 6px 24px #0008}
-  [data-tema="sihir"] .k h2{color:#d9b25f}
-  [data-tema="sihir"] button{border-color:#5e3f24}
-  [data-tema="sihir"] .dpad{background:radial-gradient(circle,#3a1d1a,#22100e);border-color:#7a5631;box-shadow:0 0 30px #d3a62522}
-  [data-tema="sihir"] .dpad .ok{background:radial-gradient(circle at 35% 30%,#f6dc8a,#c08a1e 60%,#7a4f0c);color:#2a1406;box-shadow:0 0 18px #d3a62599}
-  [data-tema="sihir"] button.kirmizi{background:linear-gradient(#8e1b24,#5c0f16)}
+  .buyulu body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% -10%,var(--isik1) 0%,transparent 60%),radial-gradient(ellipse at 50% 120%,var(--isik2) 0%,transparent 55%)}
+  .buyulu h1,.buyulu .k h2,.buyulu nav button,.buyulu .dpad .ok{font-family:Cinzel,Georgia,serif;letter-spacing:.5px}
+  .buyulu h1{color:var(--altin);text-shadow:0 0 12px color-mix(in srgb,var(--altin) 40%,transparent)}
+  .buyulu .k{background:linear-gradient(160deg,var(--kart1),var(--kart2));border-color:var(--kenar);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--altin) 14%,transparent),0 6px 24px #0008}
+  .buyulu .k h2{color:color-mix(in srgb,var(--altin) 85%,var(--m))}
+  .buyulu button{border-color:color-mix(in srgb,var(--kenar) 75%,var(--bg))}
+  .buyulu .dpad{background:radial-gradient(circle,var(--kart1),var(--kart2));border-color:var(--kenar);box-shadow:0 0 30px color-mix(in srgb,var(--altin) 14%,transparent)}
+  .buyulu .dpad .ok{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--altin) 45%,#fff) 0%,var(--altin) 45%,color-mix(in srgb,var(--altin) 40%,var(--kenar)) 100%);color:#1a0d06;box-shadow:0 0 18px color-mix(in srgb,var(--altin) 60%,transparent)}
+  .buyulu button.kirmizi{background:linear-gradient(#8e1b24,#5c0f16)}
+  #flas{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 45%,#fff,var(--kivilcim,#f6dc8a) 30%,transparent 70%)}
+  #flas.on{animation:flas .9s ease-out}
+  @keyframes flas{0%{opacity:0}15%{opacity:.9}100%{opacity:0}}
+  .asa{height:180px;border-radius:var(--r);background:var(--b);border:1px solid var(--l);display:grid;place-items:center;font-size:15px;color:var(--m);text-align:center;padding:16px}
+  .asa.on{border-color:var(--a);box-shadow:0 0 24px color-mix(in srgb,var(--a) 40%,transparent);color:var(--t)}
   .kivilcim{position:fixed;pointer-events:none;z-index:20;font-size:14px;animation:kiv .8s ease-out forwards}
   @keyframes kiv{from{opacity:1;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3)}}
   [data-tema="acik"]{--bg:#f2f3f7;--p:#fff;--b:#e7e9f0;--l:#d9dce5;--t:#14161c;--m:#646b7b}
@@ -265,6 +274,19 @@
         <li>netflix aç</li><li>youtube aç</li><li>ana sayfa</li><li>geri</li>
         <li>durdur / oynat</li><li>kapat</li><li>yaz merhaba</li><li>[makro adı]</li>
       </ul>
+      <h2 style="margin-top:14px">🪄 Büyü sözleri</h2>
+      <ul class="ipucu">
+        <li><b>Lumos</b> — aç</li><li><b>Nox</b> — kapat</li><li><b>Accio Netflix</b> — uygulama</li><li><b>Silencio</b> — sessiz</li>
+        <li><b>Sonorus</b> — ses +5</li><li><b>Quietus</b> — ses −5</li><li><b>Alohomora</b> — ana sayfa</li><li><b>Petrificus</b> — duraklat</li>
+        <li><b>Revelio</b> — menü</li><li><b>Finite</b> — geri</li>
+      </ul>
+    </div>
+    <div class="k">
+      <h2>🪄 Asa modu</h2>
+      <div class="asa" id="asa">Telefonu asa gibi tut, dokun ve başlat.<br>Sağa / sola / yukarı / aşağı savur → yön tuşu</div>
+      <div style="height:8px"></div>
+      <div class="row"><button class="a" id="asaBtn">Asayı uyandır</button><button data-k="KEY_ENTER">✦ OK</button><button data-k="KEY_RETURN">↩ Geri</button></div>
+      <div class="sw"><span>Yönleri ters çevir</span><input type="checkbox" id="asaTers"></div>
     </div>
     <div class="k">
       <h2>Klavye <small id="imeDurum"></small></h2>
@@ -382,6 +404,7 @@
   <button data-git="ayar"><span>⚙︎</span>Ayarlar</button>
 </div></nav>
 <div id="toast"></div>
+<div id="flas"></div>
 
 <script>
 'use strict';
@@ -791,11 +814,35 @@ function sayiBul(s) {
   for (const w of s.split(/\s+/)) if (w in SAYI) { t += SAYI[w]; var_ = true; }
   return var_ ? t : null;
 }
+function buyuEfekt(ad) {
+  const f = $('#flas'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
+  toast('✨ ' + ad + '!'); log('Büyü: ' + ad, 'okc');
+  if (A.titre && navigator.vibrate) navigator.vibrate([20, 40, 60]);
+}
+function acKapat(ac) { if (A.yol === 'st') return stKomut('switch', ac ? 'on' : 'off'); tus('KEY_POWER'); }
+async function sesTekrar(k, n) { for (let i = 0; i < n; i++) { tus(k); await bekle(A.yol === 'st' ? 450 : 200); } }
+function uygBul(metin) {
+  return [...A.fav, ...tvApps].find(a => { const k = a.ad.toLocaleLowerCase('tr').split(/[\s(+:]/)[0]; return k.length >= 3 && metin.includes(k); });
+}
+const BUYULER = [
+  [/l[uü]mos/, 'Lumos', () => acKapat(true)],
+  [/\bno[kx]s?\b|^noks/, 'Nox', () => acKapat(false)],
+  [/silen[sc]i?y?o/, 'Silencio', () => tus('KEY_MUTE')],
+  [/sonoru?s|sonoros/, 'Sonorus', () => sesTekrar('KEY_VOLUP', 5)],
+  [/k?u?[iy]e?tus|quietus|kuayetus/, 'Quietus', () => sesTekrar('KEY_VOLDOWN', 5)],
+  [/alo ?h?[oa] ?mora/, 'Alohomora', () => tus('KEY_HOME')],
+  [/petrifi/, 'Petrificus Totalus', () => tus('KEY_PAUSE')],
+  [/revel[iy]?o/, 'Revelio', () => tus('KEY_MENU')],
+  [/finit[ei]/, 'Finite', () => tus('KEY_RETURN')],
+  [/a[ck]+[iy]?[oe]|aksiyo|akyo/, 'Accio', s => { const a = uygBul(s); if (a) uygulamaAc(a.id, a.ad); else toast('Hangi uygulama? Örn: "Accio Netflix"'); }],
+];
 async function komut(ham) {
   const s = ham.toLocaleLowerCase('tr').replace(/[.,!?']/g, ' ').replace(/\s+/g, ' ').trim();
   const n = sayiBul(s);
   const tekrar = async (k, c) => { for (let i = 0; i < c; i++) { tus(k); await bekle(200); } };
   let r;
+  // büyü sözleri
+  for (const [re, ad, is] of BUYULER) if (re.test(s)) { buyuEfekt(ad); return is(s); }
   // makro adı
   const mk = A.makrolar.find(m => s.includes(m.ad.toLocaleLowerCase('tr')));
   if ((r = s.match(/^(yaz|ara)\s+(.+)/))) return metinGonder(ham.trim().replace(/^\S+\s+/, ''));
@@ -835,12 +882,40 @@ $('#mic').onclick = () => {
   r.start();
 };
 
+/* ---------------- asa modu ---------------- */
+let asaAcik = false, asaSon = 0;
+function asaHareket(e) {
+  const rr = e.rotationRate; if (!rr || Date.now() - asaSon < 450) return;
+  const ters = $('#asaTers').checked ? -1 : 1, g = (rr.gamma || 0) * ters, b = (rr.beta || 0) * ters, E = 220;
+  let k = null;
+  if (Math.abs(g) > E && Math.abs(g) > Math.abs(b)) k = g > 0 ? 'KEY_RIGHT' : 'KEY_LEFT';
+  else if (Math.abs(b) > E) k = b > 0 ? 'KEY_UP' : 'KEY_DOWN';
+  if (!k) return;
+  asaSon = Date.now(); tus(k);
+  const ok = { KEY_RIGHT: '→', KEY_LEFT: '←', KEY_UP: '↑', KEY_DOWN: '↓' }[k];
+  $('#asa').innerHTML = `<div style="font-size:64px;line-height:1">${ok}</div>`;
+  const r = $('#asa').getBoundingClientRect();
+  kivilcimAt(r.left + r.width / 2, r.top + r.height / 2);
+}
+$('#asaBtn').onclick = async () => {
+  if (asaAcik) { window.removeEventListener('devicemotion', asaHareket); asaAcik = false; $('#asa').classList.remove('on'); $('#asaBtn').textContent = 'Asayı uyandır'; $('#asa').innerHTML = 'Asa uyuyor.'; return; }
+  try {
+    if (typeof DeviceMotionEvent !== 'undefined' && DeviceMotionEvent.requestPermission) {
+      if (await DeviceMotionEvent.requestPermission() !== 'granted') return toast('Hareket izni verilmedi');
+    }
+  } catch (e) { return toast('Hareket izni alınamadı'); }
+  window.addEventListener('devicemotion', asaHareket); asaAcik = true;
+  $('#asa').classList.add('on'); $('#asaBtn').textContent = 'Asayı uyut'; $('#asa').innerHTML = '✨ Asa uyandı — savur!'; buyuEfekt('Asa uyandı');
+};
+
 /* ---------------- görünüm / ayarlar ---------------- */
-const TEMALAR = { sihir: '⚡ Sihir', gece: 'Gece', oled: 'OLED Siyah', okyanus: 'Okyanus', gunbatimi: 'Gün batımı', orman: 'Orman', acik: 'Açık' };
+const BUYULU = { sihir: '#d3a625', aslan: '#e0a43a', yilan: '#9fd3b8', kartal: '#c9925a', porsuk: '#f5d142' };
+const TEMALAR = { sihir: '⚡ Sihir', aslan: '🦁 Aslan', yilan: '🐍 Yılan', kartal: '🦅 Kartal', porsuk: '🦡 Porsuk', gece: 'Gece', oled: 'OLED Siyah', okyanus: 'Okyanus', gunbatimi: 'Gün batımı', orman: 'Orman', acik: 'Açık' };
 const VURGULAR = ['#5b8cff', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#06b6d4'];
 function gorunumUygula() {
   const r = document.documentElement;
   r.dataset.tema = A.tema;
+  r.classList.toggle('buyulu', A.tema in BUYULU);
   r.style.setProperty('--a', A.vurgu);
   r.style.setProperty('--s', A.boyut);
   r.style.setProperty('--r', A.kose + 'px');
@@ -862,17 +937,18 @@ function formDoldur() {
   yolGoster();
   $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
 }
-$('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; if (A.tema === 'sihir') A.vurgu = '#d3a625'; kaydet(); gorunumUygula(); } };
+$('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; if (A.tema in BUYULU) A.vurgu = BUYULU[A.tema]; kaydet(); gorunumUygula(); } };
 // Sihir temasında dokununca kıvılcım
-document.addEventListener('pointerdown', e => {
-  if (A.tema !== 'sihir' || !e.target.closest('button')) return;
+document.addEventListener('pointerdown', e => { if (A.tema in BUYULU && e.target.closest('button')) kivilcimAt(e.clientX, e.clientY); }, true);
+function kivilcimAt(x, y) {
+  const kc = getComputedStyle(document.documentElement).getPropertyValue('--kivilcim').trim() || '#f6dc8a';
   for (let i = 0; i < 6; i++) {
     const k = document.createElement('span'); k.className = 'kivilcim'; k.textContent = i % 2 ? '✦' : '✧';
     const a = Math.random() * Math.PI * 2, m = 25 + Math.random() * 35;
-    k.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;color:${i % 3 ? '#f6dc8a' : '#fff'};--dx:${Math.cos(a) * m}px;--dy:${Math.sin(a) * m}px`;
+    k.style.cssText = `left:${x}px;top:${y}px;color:${i % 3 ? kc : '#fff'};--dx:${Math.cos(a) * m}px;--dy:${Math.sin(a) * m}px`;
     document.body.appendChild(k); setTimeout(() => k.remove(), 850);
   }
-}, true);
+}
 $('#renkler').onclick = e => { const b = e.target.closest('[data-vurgu]'); if (b) { A.vurgu = b.dataset.vurgu; kaydet(); gorunumUygula(); } };
 $('#aBoyut').oninput = e => { A.boyut = +e.target.value; kaydet(); gorunumUygula(); };
 $('#aKose').oninput = e => { A.kose = +e.target.value; kaydet(); gorunumUygula(); };

@@ -7,7 +7,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&display=swap">
 <style>
   :root{--bg:#0b0d14;--p:rgba(255,255,255,.06);--l:rgba(255,255,255,.12);--t:#f1f3f8;--m:#9aa1b3;--a:#5b8cff;--glow:#5b8cff55;--font:Inter,"Samsung One",system-ui,sans-serif;--baslik:var(--font)}
-  [data-tema="sihir"]{--bg:#120709;--p:rgba(60,24,20,.55);--l:#7a5631;--t:#f3e6c4;--m:#c2a77a;--a:#e2b44a;--glow:#d3a62577;--baslik:Cinzel,Georgia,serif}
+  [data-tema="sihir"]{--bg:#120709;--p:rgba(60,24,20,.55);--l:#7a5631;--t:#f3e6c4;--m:#c2a77a;--a:#e2b44a;--glow:#d3a62577;--altin:#e8c66a;--isik1:#6a1c26aa;--isik2:#3b2608aa;--kiv:#f6d27a}
+  [data-tema="aslan"]{--bg:#140508;--p:rgba(90,18,24,.5);--l:#9a3a26;--t:#fbe9c8;--m:#d6a77a;--a:#f2b33a;--glow:#f2b33a77;--altin:#f2c14e;--isik1:#8e1b24bb;--isik2:#5a3a08aa;--kiv:#ffcf5a}
+  [data-tema="yilan"]{--bg:#040e09;--p:rgba(20,60,40,.45);--l:#3f6b55;--t:#e6efe9;--m:#9fb8ab;--a:#a9d8c0;--glow:#a9d8c066;--altin:#d5dfe2;--isik1:#1a5a3abb;--isik2:#24343a99;--kiv:#e4f2ec}
+  [data-tema="kartal"]{--bg:#050916;--p:rgba(25,40,90,.45);--l:#4a5a8a;--t:#e8ecf8;--m:#a3acc8;--a:#d39a62;--glow:#d39a6266;--altin:#d9a46c;--isik1:#1e2f6ebb;--isik2:#4a2f1499;--kiv:#eabb88}
+  [data-tema="porsuk"]{--bg:#0d0b05;--p:rgba(70,60,15,.45);--l:#7a6a24;--t:#fff6d8;--m:#cdbd8a;--a:#f5d142;--glow:#f5d14266;--altin:#f5d142;--isik1:#5a4a0abb;--isik2:#2a2a2a99;--kiv:#ffe066}
+  .buyulu{--baslik:Cinzel,Georgia,serif}
   [data-tema="gece"]{}
   [data-tema="okyanus"]{--bg:#041320;--p:rgba(20,70,100,.35);--l:#1f5878;--t:#e6f6ff;--m:#8fb7cf;--a:#2fd0e6;--glow:#2fd0e655}
   [data-tema="gunbatimi"]{--bg:#1b0b14;--p:rgba(120,40,60,.3);--l:#7a3550;--t:#fff0f3;--m:#d7a3b4;--a:#ff8a5c;--glow:#ff8a5c55}
@@ -18,7 +23,7 @@
   html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--t);font-family:var(--font);transition:background .6s}
   #gok{position:fixed;inset:0;z-index:0}
   .isik{position:fixed;inset:0;z-index:0;pointer-events:none}
-  [data-tema="sihir"] .isik{background:radial-gradient(ellipse 70% 50% at 50% -5%,#6a1c26aa,transparent 70%),radial-gradient(ellipse 60% 40% at 50% 110%,#3b2608aa,transparent 70%)}
+  .buyulu .isik{background:radial-gradient(ellipse 70% 50% at 50% -5%,var(--isik1),transparent 70%),radial-gradient(ellipse 60% 40% at 50% 110%,var(--isik2),transparent 70%)}
   [data-tema="gece"] .isik{background:radial-gradient(ellipse 60% 50% at 80% 0%,#1d2b6b88,transparent 70%)}
   [data-tema="okyanus"] .isik{background:linear-gradient(180deg,transparent 40%,#0a3a5a88),radial-gradient(ellipse 50% 40% at 20% 0%,#1b6a8f66,transparent 70%)}
   [data-tema="gunbatimi"] .isik{background:linear-gradient(180deg,#3a1030 0%,#7a2d3a 55%,#d8693c 100%);opacity:.85}
@@ -33,7 +38,9 @@
   .selam{font-family:var(--baslik);font-size:56px;font-weight:600;margin:0;text-shadow:0 0 24px var(--glow)}
   .tarih{font-size:30px;color:var(--m);margin-top:8px}
   .saat{font-family:var(--baslik);font-size:120px;font-weight:300;line-height:1;text-align:right;letter-spacing:2px;text-shadow:0 0 30px var(--glow)}
-  [data-tema="sihir"] .saat,[data-tema="sihir"] .selam{color:#e8c66a}
+  .buyulu .saat,.buyulu .selam{color:var(--altin)}
+  .soz{font-family:Georgia,serif;font-size:28px;font-style:italic;color:var(--m);margin-top:14px;opacity:.9;display:none}
+  .buyulu .soz{display:block}
   .hava{display:flex;gap:16px;justify-content:flex-end;align-items:center;font-size:30px;color:var(--m);margin-top:10px}
   .hava b{color:var(--t);font-weight:600}
 
@@ -61,18 +68,18 @@
   #kSaat{position:absolute;text-align:center;transition:left 3s,top 3s;font-family:var(--baslik);color:var(--t)}
   #kSaat b{display:block;font-size:170px;font-weight:300;text-shadow:0 0 40px var(--glow)}
   #kSaat span{font-size:34px;color:var(--m)}
-  [data-tema="sihir"] #kSaat b{color:#e8c66a}
+  .buyulu #kSaat b{color:var(--altin)}
   #mesaj{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--t);color:var(--bg);padding:18px 40px;border-radius:999px;font-size:26px;z-index:11;opacity:0;transition:opacity .3s}
   #mesaj.on{opacity:1}
 </style>
 </head>
-<body data-tema="sihir">
+<body data-tema="sihir" class="buyulu">
 <canvas id="gok"></canvas><div class="isik"></div>
 <main>
   <!-- ANA EKRAN -->
   <section class="gorunum sec" id="v-ana">
     <header>
-      <div><h1 class="selam" id="selam">İyi akşamlar</h1><div class="tarih" id="tarih"></div></div>
+      <div><h1 class="selam" id="selam">İyi akşamlar</h1><div class="tarih" id="tarih"></div><div class="soz" id="soz"></div></div>
       <div><div class="saat" id="saat">--:--</div><div class="hava" id="hava"></div></div>
     </header>
     <h2>Favorilerim</h2>
@@ -111,7 +118,8 @@ var $ = function (s) { return document.querySelector(s); };
 var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
 
 /* ---------- ayarlar ---------- */
-var TEMALAR = [['sihir', 'Sihir'], ['gece', 'Gece'], ['aurora', 'Kutup ışığı'], ['okyanus', 'Okyanus'], ['gunbatimi', 'Gün batımı'], ['orman', 'Orman']];
+var BUYULU = ['sihir', 'aslan', 'yilan', 'kartal', 'porsuk'];
+var TEMALAR = [['sihir', 'Sihir'], ['aslan', 'Aslan'], ['yilan', 'Yılan'], ['kartal', 'Kartal'], ['porsuk', 'Porsuk'], ['gece', 'Gece'], ['aurora', 'Kutup ışığı'], ['okyanus', 'Okyanus'], ['gunbatimi', 'Gün batımı'], ['orman', 'Orman']];
 var SEHIRLER = [['İstanbul', 41.01, 28.97], ['Ankara', 39.93, 32.86], ['İzmir', 38.42, 27.14], ['Bursa', 40.19, 29.06], ['Antalya', 36.9, 30.7],
   ['Adana', 37.0, 35.32], ['Konya', 37.87, 32.48], ['Gaziantep', 37.07, 37.38], ['Kayseri', 38.73, 35.49], ['Samsun', 41.29, 36.33],
   ['Trabzon', 41.0, 39.72], ['Diyarbakır', 37.91, 40.24], ['Eskişehir', 39.78, 30.52], ['Mersin', 36.8, 34.64]];
@@ -179,6 +187,12 @@ function favDegis(id) {
 }
 
 /* ---------- saat & hava ---------- */
+var SOZLER = [
+  'Asan hazırsa gece uzun değildir.', 'En güçlü büyü, iyi bir dostun sesidir.', 'Mum ışığında her kitap biraz daha sihirlidir.',
+  'Merak, tüm kapıları açan sözdür.', 'Cesaret bazen sadece bir adım daha atmaktır.', 'Yıldızlar, sabırla bakana yol gösterir.',
+  'Bir fincan sıcak çay da bir tür iksirdir.', 'Bugünün büyüsü küçük şeylerde saklı.', 'Kaybolan her şey, aranınca bulunur.',
+  'Gülümseme, en kolay öğrenilen büyüdür.', 'Bilgi, en uzun yanan meşaledir.', 'Karanlık ne kadar koyuysa ışık o kadar parlak.',
+  'Her şato, tek bir taşla başlar.', 'Dürüst bir kalp, en sağlam kalkandır.', 'Bu gece de yıldızlar senin için parlıyor.'];
 var GUNLER = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 var AYLAR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 function iki(n) { return (n < 10 ? '0' : '') + n; }
@@ -187,7 +201,10 @@ function saatGuncelle() {
   var s = iki(h) + ':' + iki(d.getMinutes()) + (A.saniye ? ':' + iki(d.getSeconds()) : '');
   var t = d.getDate() + ' ' + AYLAR[d.getMonth()] + ' ' + GUNLER[d.getDay()];
   $('#saat').textContent = s; $('#tarih').textContent = t;
-  $('#selam').textContent = h < 5 ? 'İyi geceler' : h < 12 ? 'Günaydın' : h < 18 ? 'İyi günler' : h < 22 ? 'İyi akşamlar' : 'İyi geceler';
+  var sel = h < 5 ? 'İyi geceler' : h < 12 ? 'Günaydın' : h < 18 ? 'İyi günler' : h < 22 ? 'İyi akşamlar' : 'İyi geceler';
+  $('#selam').textContent = BUYULU.indexOf(A.tema) >= 0 ? sel + ', büyücü' : sel;
+  var gun = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+  $('#soz').textContent = '“' + SOZLER[gun % SOZLER.length] + '”';
   $('#kSaat b').textContent = iki(h) + ':' + iki(d.getMinutes()); $('#kSaat span').textContent = t;
 }
 var HAVA = { 0: ['☀️', 'Açık'], 1: ['🌤️', 'Az bulutlu'], 2: ['⛅', 'Parçalı bulutlu'], 3: ['☁️', 'Kapalı'], 45: ['🌫️', 'Sisli'], 48: ['🌫️', 'Sisli'],
@@ -215,12 +232,12 @@ function gokKur(cv, yogun) {
   boyut();
   function ciz() {
     c.clearRect(0, 0, 1920, 1080);
-    var tema = document.body.dataset.tema, altin = tema === 'sihir';
+    var tema = document.body.dataset.tema, altin = BUYULU.indexOf(tema) >= 0, kiv = getComputedStyle(document.body).getPropertyValue('--kiv').trim() || '#f6d27a';
     if (tema === 'gunbatimi' || tema === 'orman') { if (A.yildiz) requestAnimationFrame(ciz); return; }
     for (var i = 0; i < yildiz.length; i++) {
       var s = yildiz[i]; if (A.yildiz) s.f += s.h;
       c.globalAlpha = .35 + .65 * Math.abs(Math.sin(s.f));
-      c.fillStyle = altin && i % 7 === 0 ? '#ffd98a' : '#ffffff';
+      c.fillStyle = altin && i % 7 === 0 ? kiv : '#ffffff';
       c.beginPath(); c.arc(s.x, s.y, s.r, 0, 6.283); c.fill();
     }
     if (altin && A.yildiz) { // süzülen altın kıvılcımlar
@@ -228,15 +245,30 @@ function gokKur(cv, yogun) {
       kivilcim = kivilcim.filter(function (k) { return k.y > -10; });
       kivilcim.forEach(function (k) {
         k.y -= k.v; k.d += .02; k.x += Math.sin(k.d) * .4;
-        c.globalAlpha = .8; c.fillStyle = '#f6d27a'; c.shadowColor = '#f6d27a'; c.shadowBlur = 12;
+        c.globalAlpha = .8; c.fillStyle = kiv; c.shadowColor = kiv; c.shadowBlur = 12;
         c.beginPath(); c.arc(k.x, k.y, k.s, 0, 6.283); c.fill(); c.shadowBlur = 0;
       });
     }
+    if (altin) mumCiz(c);
     c.globalAlpha = 1;
     if (A.yildiz) requestAnimationFrame(ciz);
   }
   ciz();
   return ciz;
+}
+/* süzülen mumlar */
+var mumlar = [];
+for (var m = 0; m < 12; m++) mumlar.push({ x: 140 + m * 140 + Math.random() * 60, y: 620 + Math.random() * 170, b: 40 + Math.random() * 40, f: Math.random() * 6.28, h: .006 + Math.random() * .01, z: .6 + Math.random() * .5 });
+function mumCiz(c) {
+  mumlar.forEach(function (k) {
+    if (A.yildiz) k.f += k.h;
+    var x = k.x, y = k.y + Math.sin(k.f) * 10, w = 9 * k.z, b = k.b * k.z, t = Math.random() * .25;
+    c.globalAlpha = .55 * k.z; c.fillStyle = '#efe4c8'; c.fillRect(x - w / 2, y, w, b);
+    c.globalAlpha = (.35 + t) * k.z; c.fillStyle = '#ffcf6a'; c.shadowColor = '#ffb347'; c.shadowBlur = 30;
+    c.beginPath(); c.ellipse(x, y - 9 * k.z, 4.5 * k.z, 10 * k.z, 0, 0, 6.283); c.fill();
+    c.globalAlpha = .9 * k.z; c.fillStyle = '#fff6d8'; c.shadowBlur = 0;
+    c.beginPath(); c.ellipse(x, y - 7 * k.z, 2 * k.z, 5 * k.z, 0, 0, 6.283); c.fill();
+  });
 }
 var gokCiz = gokKur($('#gok'), 220);
 var kGokCiz = null;
@@ -283,6 +315,8 @@ function temaDegis(yon) {
 }
 function temaUygula() {
   document.body.dataset.tema = A.tema;
+  document.body.classList.toggle('buyulu', BUYULU.indexOf(A.tema) >= 0);
+  saatGuncelle && saatGuncelle();
   var ad = TEMALAR.filter(function (t) { return t[0] === A.tema; })[0][1];
   $('#temaAd').textContent = ad;
 }
