@@ -44,6 +44,7 @@
   button:active,button.bas{transform:scale(.94);background:var(--l)}
   button.a{background:var(--a);color:var(--at);border-color:transparent}
   button.kirmizi{background:#d64545;color:#fff;border-color:transparent}
+  .btnlink{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;color:var(--t);background:var(--b);border:1px solid var(--l);border-radius:calc(var(--r) - 4px);padding:12px 10px}
   button.mini{padding:6px 10px;font-size:13px}
   .g{display:grid;gap:8px}
   .g3{grid-template-columns:repeat(3,1fr)}
@@ -289,7 +290,8 @@
       <label>Kumanda adı (TV'de görünür)</label><input id="aAd" placeholder="iPhone Kumanda">
       <label>Başlık</label><input id="aBaslik" placeholder="Salon TV">
       <div class="sw"><span>Açılışta otomatik bağlan</span><input type="checkbox" id="aOto"></div>
-      <div class="row" style="margin-top:8px"><button class="a" id="aKaydet">Kaydet & bağlan</button><button id="aSert">Sertifikayı kabul et</button></div>
+      <div class="row" style="margin-top:8px"><button class="a" id="aKaydet">Kaydet & bağlan</button><a id="aSert" class="btnlink" href="https://192.168.1.102:8002/api/v2/" target="_blank" rel="noopener">Sertifikayı kabul et</a></div>
+      <p class="muted" style="margin-bottom:0">Açılmazsa bu adresi Safari'nin adres çubuğuna kendin yaz:<br><b id="sertAdres" style="color:var(--t);-webkit-user-select:all;user-select:all">https://192.168.1.102:8002/api/v2/</b></p>
       <p class="muted">İlk kez bağlanırken "Sertifikayı kabul et"e dokun, uyarıda <b>Ayrıntılar → siteyi ziyaret et</b> de, sonra geri dön. TV'de çıkan izin uyarısına <b>İzin ver</b>.</p>
       <button id="aToken" style="width:100%">Kayıtlı izni (token) sıfırla</button>
     </div>
@@ -690,7 +692,7 @@ function gorunumUygula() {
 }
 function formDoldur() {
   $('#aIp').value = A.ip; $('#aAd').value = A.ad; $('#aBaslik').value = A.baslik; $('#aOto').checked = A.oto;
-  $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre;
+  $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre; sertGuncelle();
   $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
 }
 $('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; kaydet(); gorunumUygula(); } };
@@ -704,7 +706,8 @@ $('#aKaydet').onclick = () => {
   A.ip = $('#aIp').value.trim() || VARSAYILAN.ip; A.ad = $('#aAd').value.trim() || VARSAYILAN.ad; A.baslik = $('#aBaslik').value.trim() || VARSAYILAN.baslik;
   kaydet(); gorunumUygula(); baglan(); toast('Kaydedildi');
 };
-$('#aSert').onclick = () => window.open(`https://${$('#aIp').value.trim() || A.ip}:8002/api/v2/`, '_blank');
+function sertGuncelle() { const u = `https://${$('#aIp').value.trim() || A.ip}:8002/api/v2/`; $('#aSert').href = u; $('#sertAdres').textContent = u; }
+$('#aIp').addEventListener('input', sertGuncelle);
 $('#aToken').onclick = () => { delete A.tokens[A.ip]; try { localStorage.removeItem('tvtoken'); } catch (e) {} kaydet(); toast('İzin sıfırlandı; yeniden bağlanınca TV tekrar soracak'); };
 $('#disa').onclick = async () => {
   const j = JSON.stringify({ ...A, tokens: undefined });
