@@ -289,6 +289,9 @@
       <label>TV IP adresi</label><input id="aIp" inputmode="decimal" placeholder="192.168.1.102">
       <label>Kumanda adı (TV'de görünür)</label><input id="aAd" placeholder="iPhone Kumanda">
       <label>Başlık</label><input id="aBaslik" placeholder="Salon TV">
+      <label>Bağlantı yolu</label>
+      <select id="aPort"><option value="oto">Otomatik</option><option value="8002">Güvenli (8002, sertifika gerekir)</option><option value="8001">Basit (8001, Scriptable ile)</option></select>
+      <p class="muted" id="portBilgi" style="margin:6px 0 0"></p>
       <div class="sw"><span>Açılışta otomatik bağlan</span><input type="checkbox" id="aOto"></div>
       <div class="row" style="margin-top:8px"><button class="a" id="aKaydet">Kaydet & bağlan</button><a id="aSert" class="btnlink" href="https://192.168.1.102:8002/api/v2/" target="_blank" rel="noopener">Sertifikayı kabul et</a></div>
       <p class="muted" style="margin-bottom:0">Açılmazsa bu adresi Safari'nin adres çubuğuna kendin yaz:<br><b id="sertAdres" style="color:var(--t);-webkit-user-select:all;user-select:all">https://192.168.1.102:8002/api/v2/</b></p>
@@ -344,7 +347,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 
 /* ---------------- depolama ---------------- */
 const VARSAYILAN = {
-  ip: '192.168.1.102', ad: 'iPhone Kumanda', baslik: 'TV Kumanda', oto: true,
+  ip: '192.168.1.102', port: 'oto', ad: 'iPhone Kumanda', baslik: 'TV Kumanda', oto: true,
   tema: 'gece', vurgu: '#5b8cff', boyut: 1, kose: 16, titre: true,
   bolum: { renk: true, numara: true, goruntu: true, hizli: true },
   tokens: {},
@@ -389,13 +392,16 @@ function durum(d) {
   $('#dot').className = 'dot' + (d === 'on' ? ' on' : d === 'bek' ? ' bek' : '');
   $('#bagBtn').textContent = d === 'on' ? 'Bağlı' : d === 'bek' ? 'Bekle…' : 'Bağlan';
 }
+// https sayfası ws:// açamaz (karışık içerik); http'de (örn. Scriptable) 8001 kullanılır
+function portSec() { return A.port !== 'oto' ? A.port : (location.protocol === 'https:' ? '8002' : '8001'); }
 function baglan() {
   clearTimeout(yenidenT);
   if (ws) { elleKapat = true; try { ws.close(); } catch (e) {} }
   elleKapat = false;
   const token = A.tokens[A.ip] || '';
-  const url = `wss://${A.ip}:8002/api/v2/channels/samsung.remote.control?name=${b64(A.ad)}` + (token ? `&token=${token}` : '');
-  log('Bağlanılıyor: ' + A.ip);
+  const p = portSec();
+  const url = (p === '8001' ? `ws://${A.ip}:8001` : `wss://${A.ip}:8002`) + `/api/v2/channels/samsung.remote.control?name=${b64(A.ad)}` + (token ? `&token=${token}` : '');
+  log('Bağlanılıyor: ' + A.ip + ':' + p);
   durum('bek');
   try { ws = new WebSocket(url); } catch (e) { log('WebSocket oluşturulamadı: ' + e, 'erc'); durum('off'); return; }
   ws.onopen = () => log('Soket açıldı, izin bekleniyor (TV ekranına bak)…');
@@ -692,7 +698,7 @@ function gorunumUygula() {
 }
 function formDoldur() {
   $('#aIp').value = A.ip; $('#aAd').value = A.ad; $('#aBaslik').value = A.baslik; $('#aOto').checked = A.oto;
-  $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre; sertGuncelle();
+  $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre; $('#aPort').value = A.port; sertGuncelle(); portBilgi();
   $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
 }
 $('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; kaydet(); gorunumUygula(); } };
@@ -700,6 +706,11 @@ $('#renkler').onclick = e => { const b = e.target.closest('[data-vurgu]'); if (b
 $('#aBoyut').oninput = e => { A.boyut = +e.target.value; kaydet(); gorunumUygula(); };
 $('#aKose').oninput = e => { A.kose = +e.target.value; kaydet(); gorunumUygula(); };
 $('#aTitre').onchange = e => { A.titre = e.target.checked; kaydet(); };
+function portBilgi() {
+  const p = portSec();
+  $('#portBilgi').textContent = 'Şu an kullanılan: ' + p + (p === '8001' && location.protocol === 'https:' ? ' — ⚠️ bu sayfa https olduğu için 8001 engellenir; Scriptable ile aç.' : '');
+}
+$('#aPort').onchange = e => { A.port = e.target.value; kaydet(); portBilgi(); baglan(); };
 $('#aOto').onchange = e => { A.oto = e.target.checked; kaydet(); };
 $$('[data-b]').forEach(c => c.onchange = () => { A.bolum[c.dataset.b] = c.checked; kaydet(); gorunumUygula(); });
 $('#aKaydet').onclick = () => {
