@@ -2,95 +2,727 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>iPhone Testi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TV Kumanda">
+<meta name="theme-color" content="#0e0f13">
+<title>TV Kumanda</title>
 <style>
-  :root{--bg:#0e0f13;--p:#171920;--l:#2a2e39;--t:#eef0f5;--m:#8b91a1;--a:#5b8cff;--ok:#3ecf8e;--er:#ff6b6b}
-  body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 -apple-system,system-ui,sans-serif;padding:16px}
+  :root{
+    --bg:#0e0f13;--p:#171920;--b:#22252f;--l:#2a2e39;--t:#eef0f5;--m:#8b91a1;
+    --a:#5b8cff;--at:#fff;--ok:#3ecf8e;--er:#ff6b6b;--wa:#f5b942;
+    --r:16px;--s:1;
+  }
+  [data-tema="oled"]{--bg:#000;--p:#0a0a0a;--b:#141414;--l:#1f1f1f;--t:#fff;--m:#8a8a8a}
+  [data-tema="okyanus"]{--bg:#06141f;--p:#0c2131;--b:#123048;--l:#1a3d58;--t:#e6f4ff;--m:#82a6bf}
+  [data-tema="gunbatimi"]{--bg:#1a0f14;--p:#26161d;--b:#331d27;--l:#432634;--t:#fff0f3;--m:#c49aa8}
+  [data-tema="orman"]{--bg:#0c1410;--p:#132019;--b:#1a2c22;--l:#24392d;--t:#ecf7f0;--m:#8fae9b}
+  [data-tema="acik"]{--bg:#f2f3f7;--p:#fff;--b:#e7e9f0;--l:#d9dce5;--t:#14161c;--m:#646b7b}
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--t);font:16px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif}
+  body{padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 84px);-webkit-user-select:none;user-select:none}
   .w{max-width:460px;margin:0 auto}
-  h1{font-size:20px}
-  .k{background:var(--p);border:1px solid var(--l);border-radius:16px;padding:14px;margin-bottom:14px}
-  .k h2{font-size:13px;color:var(--m);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px}
-  button{background:var(--a);color:#fff;border:0;border-radius:12px;padding:14px 16px;font-size:16px;margin:4px 4px 4px 0}
-  button.g{background:#2a2e3a}
-  a{color:var(--a)}
-  #log{font:13px ui-monospace,monospace;white-space:pre-wrap;color:var(--m);max-height:220px;overflow:auto}
-  .ok{color:var(--ok)} .er{color:var(--er)}
+  input,textarea,select{-webkit-user-select:text;user-select:text}
+
+  header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  header h1{font-size:19px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--er);flex:none;transition:.2s}
+  .dot.on{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+  .dot.bek{background:var(--wa)}
+  .pill{background:var(--b);border:1px solid var(--l);color:var(--t);border-radius:999px;padding:7px 14px;font-size:14px}
+
+  .k{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:14px;margin-bottom:14px}
+  .k h2{font-size:12px;color:var(--m);text-transform:uppercase;letter-spacing:.7px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+  .k h2 small{text-transform:none;letter-spacing:0;font-size:12px}
+  .muted{color:var(--m);font-size:14px}
+
+  button{font:inherit;color:var(--t);background:var(--b);border:1px solid var(--l);border-radius:calc(var(--r) - 4px);
+    padding:calc(12px*var(--s)) 10px;font-size:calc(16px*var(--s));cursor:pointer;touch-action:manipulation;transition:transform .06s,background .15s}
+  button:active,button.bas{transform:scale(.94);background:var(--l)}
+  button.a{background:var(--a);color:var(--at);border-color:transparent}
+  button.kirmizi{background:#d64545;color:#fff;border-color:transparent}
+  button.mini{padding:6px 10px;font-size:13px}
+  .g{display:grid;gap:8px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row>*{flex:1}
+
+  /* yön tuşları */
+  .dpad{position:relative;width:min(270px,78vw);aspect-ratio:1;margin:6px auto 14px;border-radius:50%;
+    background:var(--b);border:1px solid var(--l);overflow:hidden}
+  .dpad button{position:absolute;border:0;border-radius:0;background:transparent;font-size:calc(22px*var(--s));color:var(--m)}
+  .dpad button:active{background:var(--l);color:var(--t);transform:none}
+  .dpad .u{top:0;left:30%;width:40%;height:30%} .dpad .d{bottom:0;left:30%;width:40%;height:30%}
+  .dpad .l{left:0;top:30%;width:30%;height:40%}  .dpad .r{right:0;top:30%;width:30%;height:40%}
+  .dpad .ok{left:30%;top:30%;width:40%;height:40%;border-radius:50%;background:var(--a);color:var(--at);font-weight:600;font-size:calc(17px*var(--s))}
+  .dpad .ok:active{background:var(--a);filter:brightness(1.2)}
+
+  .rocker{display:flex;flex-direction:column;border:1px solid var(--l);border-radius:calc(var(--r) - 2px);overflow:hidden;background:var(--b)}
+  .rocker button{border:0;border-radius:0;background:transparent;padding:calc(14px*var(--s)) 0;font-size:calc(20px*var(--s))}
+  .rocker span{text-align:center;font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.6px}
+  .ust{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px;align-items:stretch}
+  .orta{display:grid;gap:8px}
+  .renk button{height:calc(30px*var(--s));padding:0}
+  .renk [data-k="KEY_RED"]{background:#d64545}.renk [data-k="KEY_GREEN"]{background:#3aa65a}
+  .renk [data-k="KEY_YELLOW"]{background:#e2b93b}.renk [data-k="KEY_CYAN"]{background:#3b7fe2}
+
+  /* dokunmatik alan */
+  .pad{height:min(300px,60vh);border-radius:var(--r);background:
+    radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--a) 18%,transparent),transparent 60%),var(--b);
+    border:1px solid var(--l);display:flex;align-items:center;justify-content:center;color:var(--m);
+    touch-action:none;text-align:center;font-size:14px;padding:20px;position:relative}
+  .pad .iz{position:absolute;width:46px;height:46px;border-radius:50%;background:var(--a);opacity:0;pointer-events:none;transform:translate(-50%,-50%);transition:opacity .25s}
+
+  /* uygulamalar */
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .app{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;position:relative}
+  .app i{font-style:normal;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff}
+  .app b{font-weight:500;font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app .sil{position:absolute;top:4px;right:6px;font-size:13px;color:var(--m)}
+
+  /* alt menü */
+  nav{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--p) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--l);display:flex;justify-content:center;padding:6px 8px calc(env(safe-area-inset-bottom) + 6px);z-index:5}
+  nav div{display:flex;max-width:460px;width:100%}
+  nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--m);padding:6px 0}
+  nav button span{font-size:21px;line-height:1}
+  nav button.sec{color:var(--a)}
+  nav button:active{transform:none;background:none}
+  .sayfa{display:none} .sayfa.sec{display:block}
+
+  input,textarea,select{font:inherit;color:var(--t);background:var(--b);border:1px solid var(--l);border-radius:10px;padding:11px 12px;width:100%}
+  textarea{min-height:110px;font:14px ui-monospace,Menlo,monospace}
+  label{display:block;font-size:14px;color:var(--m);margin:10px 0 4px}
+  .sw{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--l)}
+  .sw:last-child{border:0}
+  .sw input{width:auto;transform:scale(1.3)}
+  .temalar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .temalar button{font-size:13px;padding:12px 4px}
+  .temalar button.sec{outline:2px solid var(--a)}
+  .renkler{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .renkler button{width:34px;height:34px;border-radius:50%;padding:0;border:2px solid transparent}
+  .renkler button.sec{border-color:var(--t)}
+
+  .mak{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--l)}
+  .mak:last-child{border:0}
+  .mak b{flex:1;font-weight:500}
+  .mic{width:120px;height:120px;border-radius:50%;font-size:46px;margin:10px auto;display:block;background:var(--a);color:var(--at);border:0}
+  .mic.dinle{animation:nabiz 1.2s infinite}
+  @keyframes nabiz{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--a) 60%,transparent)}100%{box-shadow:0 0 0 30px transparent}}
+  .ipucu{font-size:13px;color:var(--m);columns:2;margin:0;padding-left:18px}
+  #log{font:12px ui-monospace,Menlo,monospace;white-space:pre-wrap;color:var(--m);max-height:220px;overflow:auto}
+  .okc{color:var(--ok)} .erc{color:var(--er)}
+  #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%) translateY(20px);background:var(--t);color:var(--bg);
+    padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
+  #toast.on{opacity:1;transform:translateX(-50%)}
+  .gizli{display:none!important}
 </style>
 </head>
-<body><div class="w">
-<h1>🧪 iPhone → Monitör testi</h1>
+<body>
+<div class="w">
+  <header>
+    <span class="dot" id="dot"></span>
+    <h1 id="baslik">TV Kumanda</h1>
+    <button class="pill" id="bagBtn">Bağlan</button>
+  </header>
 
-<div class="k">
-  <h2>1. Monitörün sertifikasını kabul et</h2>
-  <p>Bu bağlantıya dokun. "Bu bağlantı gizli değil" uyarısı çıkarsa <b>Ayrıntıları Göster → bu web sitesini ziyaret et</b> de. Açılan boş/hata sayfası normal, sonra bu sayfaya geri dön.</p>
-  <a href="https://192.168.1.102:8002/api/v2/" target="_blank">https://192.168.1.102:8002 aç</a>
+  <!-- ============ KUMANDA ============ -->
+  <section class="sayfa sec" id="s-kumanda">
+    <div class="k">
+      <div class="g g4" style="margin-bottom:10px">
+        <button class="kirmizi" data-k="KEY_POWER">⏻</button>
+        <button data-k="KEY_SOURCE">⇥ Kaynak</button>
+        <button data-k="KEY_MUTE">🔇</button>
+        <button id="modBtn">👆 Pad</button>
+      </div>
+
+      <div id="tuslar">
+        <div class="dpad">
+          <button class="u" data-k="KEY_UP" data-r>▲</button>
+          <button class="l" data-k="KEY_LEFT" data-r>◀</button>
+          <button class="ok" data-k="KEY_ENTER">OK</button>
+          <button class="r" data-k="KEY_RIGHT" data-r>▶</button>
+          <button class="d" data-k="KEY_DOWN" data-r>▼</button>
+        </div>
+      </div>
+      <div id="padAlan" class="gizli">
+        <div class="pad" id="pad"><div>Kaydır → yön tuşu<br>Dokun → OK<br>Basılı tut → Geri</div><div class="iz" id="iz"></div></div>
+        <div style="height:12px"></div>
+      </div>
+
+      <div class="ust">
+        <div class="rocker">
+          <button data-k="KEY_VOLUP" data-r>＋</button><span>Ses</span><button data-k="KEY_VOLDOWN" data-r>－</button>
+        </div>
+        <div class="orta">
+          <div class="g g3">
+            <button data-k="KEY_RETURN">↩</button>
+            <button data-k="KEY_HOME">⌂</button>
+            <button data-k="KEY_MENU">☰</button>
+          </div>
+          <div class="g g3">
+            <button data-k="KEY_REWIND">⏪</button>
+            <button data-k="KEY_PLAY">⏯</button>
+            <button data-k="KEY_FF">⏩</button>
+          </div>
+          <div class="g g3">
+            <button data-k="KEY_INFO">ⓘ</button>
+            <button data-k="KEY_GUIDE">▦</button>
+            <button data-k="KEY_TOOLS">⚙</button>
+          </div>
+        </div>
+        <div class="rocker">
+          <button data-k="KEY_CHUP" data-r>⌃</button><span>Kanal</span><button data-k="KEY_CHDOWN" data-r>⌄</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="k bolum" data-bolum="renk">
+      <h2>Renk tuşları</h2>
+      <div class="g g4 renk">
+        <button data-k="KEY_RED"></button><button data-k="KEY_GREEN"></button><button data-k="KEY_YELLOW"></button><button data-k="KEY_CYAN"></button>
+      </div>
+    </div>
+
+    <div class="k bolum" data-bolum="numara">
+      <h2>Rakamlar</h2>
+      <div class="g g3">
+        <button data-k="KEY_1">1</button><button data-k="KEY_2">2</button><button data-k="KEY_3">3</button>
+        <button data-k="KEY_4">4</button><button data-k="KEY_5">5</button><button data-k="KEY_6">6</button>
+        <button data-k="KEY_7">7</button><button data-k="KEY_8">8</button><button data-k="KEY_9">9</button>
+        <button data-k="KEY_PRECH">↺ Önceki</button><button data-k="KEY_0">0</button><button data-k="KEY_ENTER">✓</button>
+      </div>
+    </div>
+
+    <div class="k bolum" data-bolum="goruntu">
+      <h2>Görüntü & TV ayarları <small>tek dokunuş</small></h2>
+      <div class="g g3">
+        <button data-k="KEY_PMODE">🎨 Resim modu</button>
+        <button data-k="KEY_PICTURE_SIZE">⛶ Boyut</button>
+        <button data-k="KEY_ASPECT">▭ En-boy</button>
+        <button data-k="KEY_CAPTION">💬 Altyazı</button>
+        <button data-k="KEY_SLEEP">🌙 Uyku</button>
+        <button data-k="KEY_AD">🔈 Sesli betim</button>
+      </div>
+    </div>
+
+    <div class="k bolum" data-bolum="hizli">
+      <h2>Hızlı makrolar <small><a href="#" data-git="makro" style="color:var(--a)">düzenle</a></small></h2>
+      <div class="g g3" id="hizliMak"></div>
+    </div>
+  </section>
+
+  <!-- ============ UYGULAMALAR ============ -->
+  <section class="sayfa" id="s-uyg">
+    <div class="k">
+      <h2>Favori uygulamalar <small><button class="mini" id="duzenUyg">Düzenle</button></small></h2>
+      <div class="apps" id="favApps"></div>
+    </div>
+    <div class="k">
+      <h2>TV'de yüklü olanlar <small><button class="mini" id="yenileUyg">↻ Yenile</button></small></h2>
+      <div class="apps" id="tvApps"><div class="muted" style="grid-column:1/-1">Bağlandıktan sonra TV'deki uygulamalar burada listelenir. Birine uzun basarak favorilere ekle.</div></div>
+    </div>
+    <div class="k">
+      <h2>Elle uygulama ekle</h2>
+      <div class="row"><input id="yeniAppAd" placeholder="Ad (örn. BluTV)"><input id="yeniAppId" placeholder="Uygulama ID"></div>
+      <div style="height:8px"></div>
+      <button class="a" id="appEkle" style="width:100%">Favorilere ekle</button>
+    </div>
+  </section>
+
+  <!-- ============ SES & KLAVYE ============ -->
+  <section class="sayfa" id="s-ses">
+    <div class="k">
+      <h2>Sesli komut</h2>
+      <button class="mic" id="mic">🎙️</button>
+      <p style="text-align:center;margin:4px 0 12px">Duyulan: <b id="duy">—</b></p>
+      <ul class="ipucu">
+        <li>sesi aç / kıs</li><li>sesi 5 aç</li><li>sessiz</li><li>kanal 7</li>
+        <li>netflix aç</li><li>youtube aç</li><li>ana sayfa</li><li>geri</li>
+        <li>durdur / oynat</li><li>kapat</li><li>yaz merhaba</li><li>[makro adı]</li>
+      </ul>
+    </div>
+    <div class="k">
+      <h2>Klavye <small id="imeDurum"></small></h2>
+      <p class="muted" style="margin-top:0">TV'de bir arama kutusu açıkken yaz, gönder.</p>
+      <input id="metin" placeholder="Aranacak metin…" autocomplete="off">
+      <div style="height:8px"></div>
+      <div class="row"><button class="a" id="metinGonder">Gönder</button><button id="metinBitir">Tamam ↵</button></div>
+    </div>
+  </section>
+
+  <!-- ============ MAKROLAR ============ -->
+  <section class="sayfa" id="s-makro">
+    <div class="k">
+      <h2>Makrolarım</h2>
+      <div id="makroList"></div>
+    </div>
+    <div class="k">
+      <h2 id="makroBaslik">Yeni makro</h2>
+      <label>Ad</label><input id="mAd" placeholder="örn. Film gecesi">
+      <label>Adımlar (her satıra bir tane)</label>
+      <textarea id="mAdim" placeholder="KEY_HOME&#10;bekle 1500&#10;uygulama 3201907018807&#10;yaz merhaba"></textarea>
+      <p class="muted">Satır türleri: <code>KEY_…</code> tuş · <code>KEY_VOLUP x5</code> tekrar · <code>bekle 1000</code> ms · <code>uygulama &lt;ID&gt;</code> · <code>yaz &lt;metin&gt;</code></p>
+      <div class="sw"><span>Kumanda ekranında göster</span><input type="checkbox" id="mHizli" checked></div>
+      <div class="row"><button class="a" id="mKaydet">Kaydet</button><button id="mDene">▶ Dene</button><button id="mTemizle">Temizle</button></div>
+    </div>
+    <div class="k">
+      <h2>Uyku zamanlayıcısı</h2>
+      <p class="muted" style="margin-top:0">Süre dolunca TV kapatılır. Sayfa açık kalmalı (ekran kilidi bunu durdurabilir); TV'nin kendi zamanlayıcısı için Kumanda → 🌙 Uyku.</p>
+      <div class="row">
+        <select id="uykuDk"><option value="15">15 dk</option><option value="30" selected>30 dk</option><option value="45">45 dk</option><option value="60">60 dk</option><option value="90">90 dk</option><option value="120">120 dk</option></select>
+        <button class="a" id="uykuBasla">Başlat</button>
+      </div>
+      <p id="uykuDurum" class="muted"></p>
+    </div>
+  </section>
+
+  <!-- ============ AYARLAR ============ -->
+  <section class="sayfa" id="s-ayar">
+    <div class="k">
+      <h2>Bağlantı</h2>
+      <label>TV IP adresi</label><input id="aIp" inputmode="decimal" placeholder="192.168.1.102">
+      <label>Kumanda adı (TV'de görünür)</label><input id="aAd" placeholder="iPhone Kumanda">
+      <label>Başlık</label><input id="aBaslik" placeholder="Salon TV">
+      <div class="sw"><span>Açılışta otomatik bağlan</span><input type="checkbox" id="aOto"></div>
+      <div class="row" style="margin-top:8px"><button class="a" id="aKaydet">Kaydet & bağlan</button><button id="aSert">Sertifikayı kabul et</button></div>
+      <p class="muted">İlk kez bağlanırken "Sertifikayı kabul et"e dokun, uyarıda <b>Ayrıntılar → siteyi ziyaret et</b> de, sonra geri dön. TV'de çıkan izin uyarısına <b>İzin ver</b>.</p>
+      <button id="aToken" style="width:100%">Kayıtlı izni (token) sıfırla</button>
+    </div>
+
+    <div class="k">
+      <h2>Görünüm</h2>
+      <label>Tema</label>
+      <div class="temalar" id="temalar"></div>
+      <label>Vurgu rengi</label>
+      <div class="renkler" id="renkler"></div>
+      <label>Tuş boyutu</label>
+      <input type="range" id="aBoyut" min="0.85" max="1.3" step="0.05">
+      <label>Köşe yuvarlaklığı</label>
+      <input type="range" id="aKose" min="4" max="28" step="1">
+    </div>
+
+    <div class="k">
+      <h2>Kumanda ekranı bölümleri</h2>
+      <div class="sw"><span>Renk tuşları</span><input type="checkbox" data-b="renk"></div>
+      <div class="sw"><span>Rakamlar</span><input type="checkbox" data-b="numara"></div>
+      <div class="sw"><span>Görüntü & TV ayarları</span><input type="checkbox" data-b="goruntu"></div>
+      <div class="sw"><span>Hızlı makrolar</span><input type="checkbox" data-b="hizli"></div>
+      <div class="sw"><span>Titreşim (destekleyen cihazlarda)</span><input type="checkbox" id="aTitre"></div>
+    </div>
+
+    <div class="k">
+      <h2>Yedek</h2>
+      <div class="row"><button id="disa">Ayarları kopyala</button><button id="ice">Ayarları yapıştır</button></div>
+      <div style="height:8px"></div>
+      <button id="sifirla" style="width:100%">Her şeyi varsayılana döndür</button>
+    </div>
+
+    <div class="k"><h2>Kayıt <small><a href="test.html" style="color:var(--a)">eski test sayfası</a></small></h2><div id="log"></div></div>
+  </section>
 </div>
 
-<div class="k">
-  <h2>2. Doğrudan bağlan</h2>
-  <p>Monitörde "iPhone Kumanda" için izin uyarısı çıkarsa <b>İzin ver</b>.</p>
-  <button id="bag">Bağlan</button>
-  <div>Durum: <b id="durum">bağlı değil</b></div>
-  <div>
-    <button class="g" data-k="KEY_VOLUP">🔊 Ses +</button>
-    <button class="g" data-k="KEY_VOLDOWN">🔉 Ses −</button>
-    <button class="g" data-k="KEY_HOME">⌂ Ana</button>
-  </div>
-</div>
+<nav><div>
+  <button class="sec" data-git="kumanda"><span>🎮</span>Kumanda</button>
+  <button data-git="uyg"><span>▦</span>Uygulamalar</button>
+  <button data-git="ses"><span>🎙️</span>Ses & Yaz</button>
+  <button data-git="makro"><span>⚡</span>Makrolar</button>
+  <button data-git="ayar"><span>⚙︎</span>Ayarlar</button>
+</div></nav>
+<div id="toast"></div>
 
-<div class="k">
-  <h2>3. Türkçe ses tanıma</h2>
-  <button id="mic">🎙️ Konuş</button>
-  <div>Duyulan: <b id="duy">—</b></div>
-</div>
-
-<div class="k"><h2>Kayıt</h2><div id="log"></div></div>
-</div>
 <script>
-const TV = '192.168.1.102';
+'use strict';
 const $ = s => document.querySelector(s);
-const log = (m, c) => { const d = document.createElement('div'); d.textContent = new Date().toLocaleTimeString() + ' ' + m; if (c) d.className = c; $('#log').prepend(d); };
-let ws = null;
-let token = '';
-try { token = localStorage.getItem('tvtoken') || ''; } catch (e) {}
+const $$ = s => [...document.querySelectorAll(s)];
 
-$('#bag').onclick = () => {
-  const ad = btoa('iPhone Kumanda');
-  const url = `wss://${TV}:8002/api/v2/channels/samsung.remote.control?name=${ad}` + (token ? `&token=${token}` : '');
-  log('Bağlanılıyor…');
-  $('#durum').textContent = 'bağlanıyor… (monitöre bak)';
-  try { ws = new WebSocket(url); } catch (e) { log('WebSocket oluşturulamadı: ' + e, 'er'); return; }
-  ws.onopen = () => log('Soket açıldı, izin bekleniyor…');
+/* ---------------- depolama ---------------- */
+const VARSAYILAN = {
+  ip: '192.168.1.102', ad: 'iPhone Kumanda', baslik: 'TV Kumanda', oto: true,
+  tema: 'gece', vurgu: '#5b8cff', boyut: 1, kose: 16, titre: true,
+  bolum: { renk: true, numara: true, goruntu: true, hizli: true },
+  tokens: {},
+  fav: [
+    { ad: 'Netflix', id: '3201907018807' },
+    { ad: 'YouTube', id: '111299001912' },
+    { ad: 'Prime Video', id: '3201910019365' },
+    { ad: 'Disney+', id: '3201901017640' },
+    { ad: 'Spotify', id: '3201606009684' },
+    { ad: 'Apple TV', id: '3201807016597' },
+    { ad: 'İnternet', id: 'org.tizen.browser' },
+  ],
+  makrolar: [
+    { ad: 'Netflix', hizli: true, adim: 'KEY_HOME\nbekle 1200\nuygulama 3201907018807' },
+    { ad: 'Sessiz gece', hizli: true, adim: 'KEY_VOLDOWN x8\nKEY_PMODE' },
+    { ad: 'Ana sayfa', hizli: true, adim: 'KEY_RETURN\nKEY_RETURN\nKEY_HOME' },
+  ],
+};
+let A;
+function yukle() {
+  let k = {};
+  try { k = JSON.parse(localStorage.getItem('tvkumanda') || '{}'); } catch (e) {}
+  A = Object.assign(structuredClone(VARSAYILAN), k);
+  A.bolum = Object.assign({}, VARSAYILAN.bolum, k.bolum || {});
+  try { const eski = localStorage.getItem('tvtoken'); if (eski && !A.tokens[A.ip]) A.tokens[A.ip] = eski; } catch (e) {}
+}
+function kaydet() { try { localStorage.setItem('tvkumanda', JSON.stringify(A)); } catch (e) {} }
+yukle();
+
+/* ---------------- yardımcılar ---------------- */
+const log = (m, c) => { const d = document.createElement('div'); d.textContent = new Date().toLocaleTimeString() + ' ' + m; if (c) d.className = c; $('#log').prepend(d); while ($('#log').children.length > 200) $('#log').lastChild.remove(); };
+let toastT;
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1800); };
+const titre = () => { if (A.titre && navigator.vibrate) navigator.vibrate(8); };
+const bekle = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const b64 = s => btoa(unescape(encodeURIComponent(s)));
+
+/* ---------------- bağlantı ---------------- */
+let ws = null, bagli = false, yenidenT = null, elleKapat = false;
+function durum(d) {
+  $('#dot').className = 'dot' + (d === 'on' ? ' on' : d === 'bek' ? ' bek' : '');
+  $('#bagBtn').textContent = d === 'on' ? 'Bağlı' : d === 'bek' ? 'Bekle…' : 'Bağlan';
+}
+function baglan() {
+  clearTimeout(yenidenT);
+  if (ws) { elleKapat = true; try { ws.close(); } catch (e) {} }
+  elleKapat = false;
+  const token = A.tokens[A.ip] || '';
+  const url = `wss://${A.ip}:8002/api/v2/channels/samsung.remote.control?name=${b64(A.ad)}` + (token ? `&token=${token}` : '');
+  log('Bağlanılıyor: ' + A.ip);
+  durum('bek');
+  try { ws = new WebSocket(url); } catch (e) { log('WebSocket oluşturulamadı: ' + e, 'erc'); durum('off'); return; }
+  ws.onopen = () => log('Soket açıldı, izin bekleniyor (TV ekranına bak)…');
   ws.onmessage = e => {
     let d = {}; try { d = JSON.parse(e.data); } catch (x) {}
-    log('Mesaj: ' + (d.event || e.data.slice(0, 80)));
-    if (d.event === 'ms.channel.connect') {
-      if (d.data && d.data.token) { token = d.data.token; try { localStorage.setItem('tvtoken', token); } catch (x) {} }
-      $('#durum').textContent = '✅ BAĞLANDI'; $('#durum').className = 'ok';
-      log('Bağlantı başarılı!', 'ok');
-    }
-    if (d.event === 'ms.channel.unauthorized') { $('#durum').textContent = '❌ izin verilmedi'; $('#durum').className = 'er'; }
+    const ev = d.event || '';
+    if (ev === 'ms.channel.connect') {
+      if (d.data && d.data.token) { A.tokens[A.ip] = d.data.token; kaydet(); }
+      bagli = true; durum('on'); log('Bağlandı ✓', 'okc'); toast('TV\'ye bağlandı');
+      tvUygulamaIste();
+    } else if (ev === 'ms.channel.unauthorized') {
+      durum('off'); log('TV izin vermedi', 'erc'); toast('TV izin vermedi');
+    } else if (ev === 'ed.installedApp.get') {
+      tvUygulamaGoster((d.data && d.data.data) || []);
+    } else if (ev === 'ms.remote.imeStart') {
+      $('#imeDurum').textContent = '● TV klavyesi açık'; $('#imeDurum').style.color = 'var(--ok)'; toast('TV klavyesi açık — Ses & Yaz sekmesinden yaz');
+    } else if (ev === 'ms.remote.imeEnd') {
+      $('#imeDurum').textContent = '';
+    } else if (ev) { log('Olay: ' + ev); }
   };
-  ws.onerror = () => { log('Bağlantı hatası (sertifika adımı yapıldı mı?)', 'er'); $('#durum').textContent = '❌ hata'; $('#durum').className = 'er'; };
-  ws.onclose = e => log('Soket kapandı, kod ' + e.code);
-};
+  ws.onerror = () => { log('Bağlantı hatası — IP doğru mu, sertifika kabul edildi mi?', 'erc'); };
+  ws.onclose = e => {
+    bagli = false; durum('off'); log('Bağlantı kapandı (' + e.code + ')');
+    if (!elleKapat && A.oto && document.visibilityState === 'visible') yenidenT = setTimeout(baglan, 4000);
+  };
+}
+function gonder(obj) {
+  if (!ws || ws.readyState !== 1) { toast('Önce bağlan'); if (!ws || ws.readyState > 1) baglan(); return false; }
+  ws.send(JSON.stringify(obj)); return true;
+}
+function tus(k) {
+  titre();
+  if (gonder({ method: 'ms.remote.control', params: { Cmd: 'Click', DataOfCmd: k, Option: 'false', TypeOfRemote: 'SendRemoteKey' } })) log('→ ' + k);
+}
+function metinGonder(t) {
+  if (gonder({ method: 'ms.remote.control', params: { Cmd: b64(t), DataOfCmd: 'base64', TypeOfRemote: 'SendInputString' } })) log('→ yazı: ' + t, 'okc');
+}
+function metinBitir() { gonder({ method: 'ms.remote.control', params: { TypeOfRemote: 'SendInputEnd' } }); }
+function uygulamaAc(id, ad) {
+  titre();
+  const ok = gonder({ method: 'ms.channel.emit', params: { event: 'ed.apps.launch', to: 'host',
+    data: { appId: id, action_type: /^\d+$/.test(id) ? 'DEEP_LINK' : 'NATIVE_LAUNCH' } } });
+  if (ok) { log('→ uygulama: ' + (ad || id), 'okc'); toast((ad || id) + ' açılıyor'); }
+}
+function tvUygulamaIste() { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.installedApp.get', to: 'host' } })); }
 
-document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
-  if (!ws || ws.readyState !== 1) { log('Önce bağlan', 'er'); return; }
-  ws.send(JSON.stringify({ method: 'ms.remote.control', params: { Cmd: 'Click', DataOfCmd: b.dataset.k, Option: 'false', TypeOfRemote: 'SendRemoteKey' } }));
-  log('Gönderildi: ' + b.dataset.k, 'ok');
+$('#bagBtn').onclick = () => { if (bagli) toast('Zaten bağlı'); else baglan(); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && A.oto && !bagli && (!ws || ws.readyState > 1)) baglan(); });
+
+/* ---------------- tuşlar (basılı tutunca tekrar) ---------------- */
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  e.preventDefault();
+  b.classList.add('bas');
+  tus(b.dataset.k);
+  if (b.hasAttribute('data-r')) {
+    let iv; const t = setTimeout(() => { iv = setInterval(() => tus(b.dataset.k), 130); }, 400);
+    const bit = () => { clearTimeout(t); clearInterval(iv); b.classList.remove('bas'); ['pointerup', 'pointercancel', 'pointerleave'].forEach(x => b.removeEventListener(x, bit)); };
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(x => b.addEventListener(x, bit));
+  } else {
+    const bit = () => { b.classList.remove('bas'); };
+    b.addEventListener('pointerup', bit, { once: true }); b.addEventListener('pointercancel', bit, { once: true });
+  }
 });
 
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!SR) { $('#duy').textContent = '❌ Bu tarayıcıda ses tanıma yok'; }
-$('#mic').onclick = () => {
-  if (!SR) return;
-  const r = new SR(); r.lang = 'tr-TR'; r.interimResults = false;
-  r.onresult = e => { $('#duy').textContent = e.results[0][0].transcript; log('Ses tanındı: ' + e.results[0][0].transcript, 'ok'); };
-  r.onerror = e => log('Ses hatası: ' + e.error, 'er');
-  r.start(); $('#duy').textContent = 'dinliyorum…';
+/* ---------------- dokunmatik alan ---------------- */
+let padMod = false;
+$('#modBtn').onclick = () => {
+  padMod = !padMod;
+  $('#tuslar').classList.toggle('gizli', padMod); $('#padAlan').classList.toggle('gizli', !padMod);
+  $('#modBtn').textContent = padMod ? '✛ Tuşlar' : '👆 Pad';
 };
+(() => {
+  const pad = $('#pad'), iz = $('#iz');
+  let x0, y0, sx, sy, uzunT, kaydi, uzun;
+  const ADIM = 45;
+  pad.addEventListener('pointerdown', e => {
+    pad.setPointerCapture(e.pointerId);
+    x0 = sx = e.clientX; y0 = sy = e.clientY; kaydi = false; uzun = false;
+    const r = pad.getBoundingClientRect(); iz.style.left = (e.clientX - r.left) + 'px'; iz.style.top = (e.clientY - r.top) + 'px'; iz.style.opacity = .35;
+    uzunT = setTimeout(() => { if (!kaydi) { uzun = true; tus('KEY_RETURN'); } }, 600);
+  });
+  pad.addEventListener('pointermove', e => {
+    if (x0 === undefined) return;
+    const r = pad.getBoundingClientRect(); iz.style.left = (e.clientX - r.left) + 'px'; iz.style.top = (e.clientY - r.top) + 'px';
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    if (Math.abs(dx) > ADIM || Math.abs(dy) > ADIM) {
+      kaydi = true; clearTimeout(uzunT);
+      if (Math.abs(dx) > Math.abs(dy)) { tus(dx > 0 ? 'KEY_RIGHT' : 'KEY_LEFT'); x0 = e.clientX; y0 = e.clientY; }
+      else { tus(dy > 0 ? 'KEY_DOWN' : 'KEY_UP'); x0 = e.clientX; y0 = e.clientY; }
+    }
+  });
+  const bit = e => {
+    if (x0 === undefined) return;
+    clearTimeout(uzunT); iz.style.opacity = 0;
+    if (!kaydi && !uzun && Math.hypot(e.clientX - sx, e.clientY - sy) < 12) tus('KEY_ENTER');
+    x0 = undefined;
+  };
+  pad.addEventListener('pointerup', bit); pad.addEventListener('pointercancel', () => { clearTimeout(uzunT); iz.style.opacity = 0; x0 = undefined; });
+})();
+
+/* ---------------- sayfalar ---------------- */
+function git(s) {
+  $$('.sayfa').forEach(x => x.classList.toggle('sec', x.id === 's-' + s));
+  $$('nav button').forEach(x => x.classList.toggle('sec', x.dataset.git === s));
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', e => { const g = e.target.closest('[data-git]'); if (g) { e.preventDefault(); git(g.dataset.git); } });
+
+/* ---------------- uygulamalar ---------------- */
+const RENKLER = { netflix: '#e50914', youtube: '#ff0033', prime: '#00a8e1', disney: '#113ccf', spotify: '#1db954', apple: '#333', twitch: '#9146ff', blutv: '#0094ff', exxen: '#ffcc00', tabii: '#0f6', gain: '#7b2cff', mubi: '#001489', trt: '#e30a17' };
+function appRenk(ad) {
+  const k = ad.toLowerCase(); for (const r in RENKLER) if (k.includes(r)) return RENKLER[r];
+  let h = 0; for (const c of ad) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h} 55% 45%)`;
+}
+const appKutu = (a, sil) => `<button class="app" data-app="${esc(a.id)}" data-ad="${esc(a.ad)}">${sil ? '<span class="sil">✕</span>' : ''}<i style="background:${appRenk(a.ad)}">${esc(a.ad.trim()[0] || '?').toUpperCase()}</i><b>${esc(a.ad)}</b></button>`;
+let uygDuzen = false;
+function favCiz() {
+  $('#favApps').innerHTML = A.fav.map(a => appKutu(a, uygDuzen)).join('') || '<div class="muted">Favori yok</div>';
+  $('#duzenUyg').textContent = uygDuzen ? 'Bitti' : 'Düzenle';
+}
+$('#favApps').onclick = e => {
+  const b = e.target.closest('[data-app]'); if (!b) return;
+  if (uygDuzen) { A.fav = A.fav.filter(a => a.id !== b.dataset.app); kaydet(); favCiz(); }
+  else uygulamaAc(b.dataset.app, b.dataset.ad);
+};
+$('#duzenUyg').onclick = () => { uygDuzen = !uygDuzen; favCiz(); };
+$('#yenileUyg').onclick = () => { if (!bagli) return toast('Önce bağlan'); tvUygulamaIste(); toast('Liste isteniyor…'); };
+$('#appEkle').onclick = () => {
+  const ad = $('#yeniAppAd').value.trim(), id = $('#yeniAppId').value.trim();
+  if (!ad || !id) return toast('Ad ve ID gerekli');
+  A.fav.push({ ad, id }); kaydet(); favCiz(); $('#yeniAppAd').value = $('#yeniAppId').value = ''; toast('Eklendi');
+};
+let tvApps = [];
+function tvUygulamaGoster(l) {
+  tvApps = l.map(x => ({ ad: x.name, id: x.appId })).filter(x => x.id).sort((a, b) => a.ad.localeCompare(b.ad, 'tr'));
+  $('#tvApps').innerHTML = tvApps.map(a => appKutu(a)).join('') || '<div class="muted" style="grid-column:1/-1">TV uygulama listesi göndermedi.</div>';
+  log(tvApps.length + ' uygulama bulundu', 'okc');
+}
+(() => {
+  let t, uzun;
+  $('#tvApps').addEventListener('pointerdown', e => {
+    const b = e.target.closest('[data-app]'); if (!b) return; uzun = false;
+    t = setTimeout(() => {
+      uzun = true;
+      if (!A.fav.some(a => a.id === b.dataset.app)) { A.fav.push({ ad: b.dataset.ad, id: b.dataset.app }); kaydet(); favCiz(); toast(b.dataset.ad + ' favorilere eklendi'); }
+      else toast('Zaten favorilerde');
+    }, 550);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(x => $('#tvApps').addEventListener(x, () => clearTimeout(t), true));
+  $('#tvApps').addEventListener('click', e => { const b = e.target.closest('[data-app]'); if (b && !uzun) uygulamaAc(b.dataset.app, b.dataset.ad); });
+  $('#tvApps').addEventListener('contextmenu', e => e.preventDefault());
+})();
+
+/* ---------------- makrolar ---------------- */
+let calisiyor = false;
+async function makroCalistir(m) {
+  if (calisiyor) return toast('Bir makro zaten çalışıyor');
+  if (!bagli) return toast('Önce bağlan');
+  calisiyor = true; toast('▶ ' + m.ad);
+  try {
+    for (const ham of m.adim.split('\n')) {
+      const s = ham.trim(); if (!s || s.startsWith('#')) continue;
+      let r;
+      if ((r = s.match(/^bekle\s+(\d+)/i))) await bekle(+r[1]);
+      else if ((r = s.match(/^uygulama\s+(\S+)/i))) { uygulamaAc(r[1], (A.fav.find(a => a.id === r[1]) || {}).ad); await bekle(400); }
+      else if ((r = s.match(/^yaz\s+(.+)/i))) { metinGonder(r[1]); await bekle(300); }
+      else if ((r = s.match(/^(KEY_[A-Z0-9_]+)(?:\s*x\s*(\d+))?$/i))) {
+        const n = Math.min(+(r[2] || 1), 50);
+        for (let i = 0; i < n; i++) { tus(r[1].toUpperCase()); await bekle(250); }
+      } else log('Anlaşılmayan satır: ' + s, 'erc');
+      if (!bagli) throw new Error('bağlantı koptu');
+    }
+  } catch (e) { log('Makro durdu: ' + e.message, 'erc'); }
+  calisiyor = false;
+}
+let duzenlenen = -1;
+function makroCiz() {
+  $('#makroList').innerHTML = A.makrolar.map((m, i) => `<div class="mak"><b>${esc(m.ad)}</b>
+    <button class="mini a" data-m="calis" data-i="${i}">▶</button><button class="mini" data-m="duzen" data-i="${i}">✎</button><button class="mini" data-m="sil" data-i="${i}">✕</button></div>`).join('')
+    || '<div class="muted">Henüz makro yok.</div>';
+  const h = A.makrolar.map((m, i) => [m, i]).filter(([m]) => m.hizli);
+  $('#hizliMak').innerHTML = h.map(([m, i]) => `<button data-m="calis" data-i="${i}">⚡ ${esc(m.ad)}</button>`).join('') || '<div class="muted" style="grid-column:1/-1">Hızlı makro yok</div>';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b) return;
+  const i = +b.dataset.i, m = A.makrolar[i];
+  if (b.dataset.m === 'calis') makroCalistir(m);
+  if (b.dataset.m === 'sil' && confirm(`"${m.ad}" silinsin mi?`)) { A.makrolar.splice(i, 1); kaydet(); makroCiz(); formTemizle(); }
+  if (b.dataset.m === 'duzen') {
+    duzenlenen = i; $('#mAd').value = m.ad; $('#mAdim').value = m.adim; $('#mHizli').checked = !!m.hizli;
+    $('#makroBaslik').textContent = 'Düzenle: ' + m.ad; $('#mAd').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+function formTemizle() { duzenlenen = -1; $('#mAd').value = $('#mAdim').value = ''; $('#mHizli').checked = true; $('#makroBaslik').textContent = 'Yeni makro'; }
+$('#mTemizle').onclick = formTemizle;
+$('#mDene').onclick = () => makroCalistir({ ad: $('#mAd').value || 'deneme', adim: $('#mAdim').value });
+$('#mKaydet').onclick = () => {
+  const m = { ad: $('#mAd').value.trim(), adim: $('#mAdim').value.trim(), hizli: $('#mHizli').checked };
+  if (!m.ad || !m.adim) return toast('Ad ve adımlar gerekli');
+  if (duzenlenen >= 0) A.makrolar[duzenlenen] = m; else A.makrolar.push(m);
+  kaydet(); makroCiz(); formTemizle(); toast('Makro kaydedildi');
+};
+
+/* uyku zamanlayıcısı */
+let uykuSon = 0, uykuIv = null;
+function uykuGuncelle() {
+  if (!uykuSon) { $('#uykuDurum').textContent = ''; $('#uykuBasla').textContent = 'Başlat'; return; }
+  const k = uykuSon - Date.now();
+  if (k <= 0) { uykuSon = 0; clearInterval(uykuIv); tus('KEY_POWER'); log('Uyku zamanlayıcısı: TV kapatıldı', 'okc'); uykuGuncelle(); return; }
+  $('#uykuDurum').textContent = `TV ${Math.floor(k / 60000)} dk ${Math.floor(k / 1000) % 60} sn sonra kapanacak`;
+  $('#uykuBasla').textContent = 'İptal';
+}
+$('#uykuBasla').onclick = () => {
+  if (uykuSon) { uykuSon = 0; clearInterval(uykuIv); toast('Zamanlayıcı iptal'); }
+  else { uykuSon = Date.now() + $('#uykuDk').value * 60000; uykuIv = setInterval(uykuGuncelle, 1000); toast('Zamanlayıcı başladı'); }
+  uykuGuncelle();
+};
+
+/* ---------------- ses & klavye ---------------- */
+$('#metinGonder').onclick = () => { const t = $('#metin').value; if (t) metinGonder(t); };
+$('#metinBitir').onclick = () => { metinBitir(); tus('KEY_ENTER'); };
+$('#metin').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#metinGonder').click(); } });
+
+const SAYI = { sıfır: 0, bir: 1, iki: 2, üç: 3, dört: 4, beş: 5, altı: 6, yedi: 7, sekiz: 8, dokuz: 9, on: 10, yirmi: 20, otuz: 30, kırk: 40, elli: 50, altmış: 60, yetmiş: 70, seksen: 80, doksan: 90, yüz: 100 };
+function sayiBul(s) {
+  const d = s.match(/\d+/); if (d) return +d[0];
+  let t = 0, var_ = false;
+  for (const w of s.split(/\s+/)) if (w in SAYI) { t += SAYI[w]; var_ = true; }
+  return var_ ? t : null;
+}
+async function komut(ham) {
+  const s = ham.toLocaleLowerCase('tr').replace(/[.,!?']/g, ' ').replace(/\s+/g, ' ').trim();
+  const n = sayiBul(s);
+  const tekrar = async (k, c) => { for (let i = 0; i < c; i++) { tus(k); await bekle(200); } };
+  let r;
+  // makro adı
+  const mk = A.makrolar.find(m => s.includes(m.ad.toLocaleLowerCase('tr')));
+  if ((r = s.match(/^(yaz|ara)\s+(.+)/))) return metinGonder(ham.trim().replace(/^\S+\s+/, ''));
+  if (/sessiz|sesi kapat/.test(s)) return tus('KEY_MUTE');
+  if (/ses/.test(s) && /(aç|art|yüksel|fazla)/.test(s)) return tekrar('KEY_VOLUP', Math.min(n || 3, 30));
+  if (/ses/.test(s) && /(kıs|azal|düşür|az)/.test(s)) return tekrar('KEY_VOLDOWN', Math.min(n || 3, 30));
+  if (/kanal/.test(s) && n !== null) { for (const c of String(n)) { tus('KEY_' + c); await bekle(200); } return tus('KEY_ENTER'); }
+  if (/(sonraki|ileri|yukarı) kanal|kanal (ileri|yukarı|sonraki)/.test(s)) return tus('KEY_CHUP');
+  if (/(önceki|geri|aşağı) kanal|kanal (geri|aşağı|önceki)/.test(s)) return tus('KEY_CHDOWN');
+  // uygulama aç
+  const tum = [...A.fav, ...tvApps];
+  const app = tum.find(a => { const k = a.ad.toLocaleLowerCase('tr').split(/[\s(+:]/)[0]; return k.length >= 3 && s.includes(k); });
+  if (app && !mk) return uygulamaAc(app.id, app.ad);
+  if (mk) return makroCalistir(mk);
+  if (/(tv|televizyon|ekran)?.*(kapat|kapan)/.test(s)) return tus('KEY_POWER');
+  if (/ana (sayfa|ekran|menü)/.test(s)) return tus('KEY_HOME');
+  if (/^(geri|geri dön)$/.test(s)) return tus('KEY_RETURN');
+  if (/(durdur|duraklat|bekle)/.test(s)) return tus('KEY_PAUSE');
+  if (/(oynat|devam|başlat)/.test(s)) return tus('KEY_PLAY');
+  if (/kaynak/.test(s)) return tus('KEY_SOURCE');
+  if (/resim modu|görüntü modu/.test(s)) return tus('KEY_PMODE');
+  if (/altyazı/.test(s)) return tus('KEY_CAPTION');
+  if (/menü|ayarlar/.test(s)) return tus('KEY_MENU');
+  const yon = { yukarı: 'KEY_UP', aşağı: 'KEY_DOWN', sol: 'KEY_LEFT', sola: 'KEY_LEFT', sağ: 'KEY_RIGHT', sağa: 'KEY_RIGHT', tamam: 'KEY_ENTER', seç: 'KEY_ENTER' };
+  for (const w in yon) if (s.split(' ').includes(w)) return tekrar(yon[w], Math.min(n || 1, 20));
+  toast('Anlaşılmadı: ' + ham); log('Komut anlaşılmadı: ' + ham, 'erc');
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) $('#duy').textContent = 'Bu tarayıcıda ses tanıma yok';
+$('#mic').onclick = () => {
+  if (!SR) return toast('Ses tanıma desteklenmiyor');
+  const r = new SR(); r.lang = 'tr-TR'; r.interimResults = false; r.maxAlternatives = 1;
+  $('#mic').classList.add('dinle'); $('#duy').textContent = 'dinliyorum…';
+  r.onresult = e => { const t = e.results[0][0].transcript; $('#duy').textContent = t; log('Ses: ' + t, 'okc'); komut(t); };
+  r.onerror = e => { log('Ses hatası: ' + e.error, 'erc'); $('#duy').textContent = '—'; };
+  r.onend = () => $('#mic').classList.remove('dinle');
+  r.start();
+};
+
+/* ---------------- görünüm / ayarlar ---------------- */
+const TEMALAR = { gece: 'Gece', oled: 'OLED Siyah', okyanus: 'Okyanus', gunbatimi: 'Gün batımı', orman: 'Orman', acik: 'Açık' };
+const VURGULAR = ['#5b8cff', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#06b6d4'];
+function gorunumUygula() {
+  const r = document.documentElement;
+  r.dataset.tema = A.tema;
+  r.style.setProperty('--a', A.vurgu);
+  r.style.setProperty('--s', A.boyut);
+  r.style.setProperty('--r', A.kose + 'px');
+  const h = A.vurgu.replace('#', ''); const lum = (parseInt(h.slice(0, 2), 16) * 299 + parseInt(h.slice(2, 4), 16) * 587 + parseInt(h.slice(4, 6), 16) * 114) / 1000;
+  r.style.setProperty('--at', lum > 160 ? '#111' : '#fff');
+  document.querySelector('meta[name=theme-color]').content = getComputedStyle(r).getPropertyValue('--bg').trim();
+  $('#baslik').textContent = A.baslik; document.title = A.baslik;
+  $$('.bolum').forEach(b => b.classList.toggle('gizli', !A.bolum[b.dataset.bolum]));
+  $('#temalar').innerHTML = Object.entries(TEMALAR).map(([k, v]) => `<button data-tema="${k}" class="${k === A.tema ? 'sec' : ''}" style="background:var(--p);color:var(--t)">${v}</button>`).join('');
+  $('#renkler').innerHTML = VURGULAR.map(c => `<button data-vurgu="${c}" class="${c === A.vurgu ? 'sec' : ''}" style="background:${c}" aria-label="${c}"></button>`).join('')
+    + `<label style="margin:0;position:relative;width:34px;height:34px;border-radius:50%;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);overflow:hidden"><input type="color" id="ozelRenk" value="${A.vurgu}" style="opacity:0;position:absolute;inset:0;padding:0"></label>`;
+  $('#ozelRenk').oninput = e => { A.vurgu = e.target.value; kaydet(); gorunumUygula(); };
+}
+function formDoldur() {
+  $('#aIp').value = A.ip; $('#aAd').value = A.ad; $('#aBaslik').value = A.baslik; $('#aOto').checked = A.oto;
+  $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre;
+  $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
+}
+$('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; kaydet(); gorunumUygula(); } };
+$('#renkler').onclick = e => { const b = e.target.closest('[data-vurgu]'); if (b) { A.vurgu = b.dataset.vurgu; kaydet(); gorunumUygula(); } };
+$('#aBoyut').oninput = e => { A.boyut = +e.target.value; kaydet(); gorunumUygula(); };
+$('#aKose').oninput = e => { A.kose = +e.target.value; kaydet(); gorunumUygula(); };
+$('#aTitre').onchange = e => { A.titre = e.target.checked; kaydet(); };
+$('#aOto').onchange = e => { A.oto = e.target.checked; kaydet(); };
+$$('[data-b]').forEach(c => c.onchange = () => { A.bolum[c.dataset.b] = c.checked; kaydet(); gorunumUygula(); });
+$('#aKaydet').onclick = () => {
+  A.ip = $('#aIp').value.trim() || VARSAYILAN.ip; A.ad = $('#aAd').value.trim() || VARSAYILAN.ad; A.baslik = $('#aBaslik').value.trim() || VARSAYILAN.baslik;
+  kaydet(); gorunumUygula(); baglan(); toast('Kaydedildi');
+};
+$('#aSert').onclick = () => window.open(`https://${$('#aIp').value.trim() || A.ip}:8002/api/v2/`, '_blank');
+$('#aToken').onclick = () => { delete A.tokens[A.ip]; try { localStorage.removeItem('tvtoken'); } catch (e) {} kaydet(); toast('İzin sıfırlandı; yeniden bağlanınca TV tekrar soracak'); };
+$('#disa').onclick = async () => {
+  const j = JSON.stringify({ ...A, tokens: undefined });
+  try { await navigator.clipboard.writeText(j); toast('Panoya kopyalandı'); } catch (e) { prompt('Kopyala:', j); }
+};
+$('#ice').onclick = () => {
+  const j = prompt('Kopyaladığın ayar metnini yapıştır:'); if (!j) return;
+  try { const y = JSON.parse(j); const tok = A.tokens; A = Object.assign(structuredClone(VARSAYILAN), y, { tokens: tok }); kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Ayarlar yüklendi'); }
+  catch (e) { toast('Geçersiz metin'); }
+};
+$('#sifirla').onclick = () => {
+  if (!confirm('Tema, favoriler ve makrolar varsayılana dönsün mü? (TV izni korunur)')) return;
+  const tok = A.tokens; A = structuredClone(VARSAYILAN); A.tokens = tok; kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Sıfırlandı');
+};
+
+/* ---------------- başlat ---------------- */
+gorunumUygula(); formDoldur(); favCiz(); makroCiz();
+if (A.oto) baglan();
 </script>
 </body>
 </html>
