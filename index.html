@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iPhone Testi</title>
+<style>
+  :root{--bg:#0e0f13;--p:#171920;--l:#2a2e39;--t:#eef0f5;--m:#8b91a1;--a:#5b8cff;--ok:#3ecf8e;--er:#ff6b6b}
+  body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 -apple-system,system-ui,sans-serif;padding:16px}
+  .w{max-width:460px;margin:0 auto}
+  h1{font-size:20px}
+  .k{background:var(--p);border:1px solid var(--l);border-radius:16px;padding:14px;margin-bottom:14px}
+  .k h2{font-size:13px;color:var(--m);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px}
+  button{background:var(--a);color:#fff;border:0;border-radius:12px;padding:14px 16px;font-size:16px;margin:4px 4px 4px 0}
+  button.g{background:#2a2e3a}
+  a{color:var(--a)}
+  #log{font:13px ui-monospace,monospace;white-space:pre-wrap;color:var(--m);max-height:220px;overflow:auto}
+  .ok{color:var(--ok)} .er{color:var(--er)}
+</style>
+</head>
+<body><div class="w">
+<h1>🧪 iPhone → Monitör testi</h1>
+
+<div class="k">
+  <h2>1. Monitörün sertifikasını kabul et</h2>
+  <p>Bu bağlantıya dokun. "Bu bağlantı gizli değil" uyarısı çıkarsa <b>Ayrıntıları Göster → bu web sitesini ziyaret et</b> de. Açılan boş/hata sayfası normal, sonra bu sayfaya geri dön.</p>
+  <a href="https://192.168.1.102:8002/api/v2/" target="_blank">https://192.168.1.102:8002 aç</a>
+</div>
+
+<div class="k">
+  <h2>2. Doğrudan bağlan</h2>
+  <p>Monitörde "iPhone Kumanda" için izin uyarısı çıkarsa <b>İzin ver</b>.</p>
+  <button id="bag">Bağlan</button>
+  <div>Durum: <b id="durum">bağlı değil</b></div>
+  <div>
+    <button class="g" data-k="KEY_VOLUP">🔊 Ses +</button>
+    <button class="g" data-k="KEY_VOLDOWN">🔉 Ses −</button>
+    <button class="g" data-k="KEY_HOME">⌂ Ana</button>
+  </div>
+</div>
+
+<div class="k">
+  <h2>3. Türkçe ses tanıma</h2>
+  <button id="mic">🎙️ Konuş</button>
+  <div>Duyulan: <b id="duy">—</b></div>
+</div>
+
+<div class="k"><h2>Kayıt</h2><div id="log"></div></div>
+</div>
+<script>
+const TV = '192.168.1.102';
+const $ = s => document.querySelector(s);
+const log = (m, c) => { const d = document.createElement('div'); d.textContent = new Date().toLocaleTimeString() + ' ' + m; if (c) d.className = c; $('#log').prepend(d); };
+let ws = null;
+let token = '';
+try { token = localStorage.getItem('tvtoken') || ''; } catch (e) {}
+
+$('#bag').onclick = () => {
+  const ad = btoa('iPhone Kumanda');
+  const url = `wss://${TV}:8002/api/v2/channels/samsung.remote.control?name=${ad}` + (token ? `&token=${token}` : '');
+  log('Bağlanılıyor…');
+  $('#durum').textContent = 'bağlanıyor… (monitöre bak)';
+  try { ws = new WebSocket(url); } catch (e) { log('WebSocket oluşturulamadı: ' + e, 'er'); return; }
+  ws.onopen = () => log('Soket açıldı, izin bekleniyor…');
+  ws.onmessage = e => {
+    let d = {}; try { d = JSON.parse(e.data); } catch (x) {}
+    log('Mesaj: ' + (d.event || e.data.slice(0, 80)));
+    if (d.event === 'ms.channel.connect') {
+      if (d.data && d.data.token) { token = d.data.token; try { localStorage.setItem('tvtoken', token); } catch (x) {} }
+      $('#durum').textContent = '✅ BAĞLANDI'; $('#durum').className = 'ok';
+      log('Bağlantı başarılı!', 'ok');
+    }
+    if (d.event === 'ms.channel.unauthorized') { $('#durum').textContent = '❌ izin verilmedi'; $('#durum').className = 'er'; }
+  };
+  ws.onerror = () => { log('Bağlantı hatası (sertifika adımı yapıldı mı?)', 'er'); $('#durum').textContent = '❌ hata'; $('#durum').className = 'er'; };
+  ws.onclose = e => log('Soket kapandı, kod ' + e.code);
+};
+
+document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+  if (!ws || ws.readyState !== 1) { log('Önce bağlan', 'er'); return; }
+  ws.send(JSON.stringify({ method: 'ms.remote.control', params: { Cmd: 'Click', DataOfCmd: b.dataset.k, Option: 'false', TypeOfRemote: 'SendRemoteKey' } }));
+  log('Gönderildi: ' + b.dataset.k, 'ok');
+});
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) { $('#duy').textContent = '❌ Bu tarayıcıda ses tanıma yok'; }
+$('#mic').onclick = () => {
+  if (!SR) return;
+  const r = new SR(); r.lang = 'tr-TR'; r.interimResults = false;
+  r.onresult = e => { $('#duy').textContent = e.results[0][0].transcript; log('Ses tanındı: ' + e.results[0][0].transcript, 'ok'); };
+  r.onerror = e => log('Ses hatası: ' + e.error, 'er');
+  r.start(); $('#duy').textContent = 'dinliyorum…';
+};
+</script>
+</body>
+</html>
