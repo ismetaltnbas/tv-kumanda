@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="TV Kumanda">
 <meta name="theme-color" content="#0e0f13">
 <title>TV Kumanda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap">
 <style>
   :root{
     --bg:#0e0f13;--p:#171920;--b:#22252f;--l:#2a2e39;--t:#eef0f5;--m:#8b91a1;
@@ -19,6 +21,23 @@
   [data-tema="okyanus"]{--bg:#06141f;--p:#0c2131;--b:#123048;--l:#1a3d58;--t:#e6f4ff;--m:#82a6bf}
   [data-tema="gunbatimi"]{--bg:#1a0f14;--p:#26161d;--b:#331d27;--l:#432634;--t:#fff0f3;--m:#c49aa8}
   [data-tema="orman"]{--bg:#0c1410;--p:#132019;--b:#1a2c22;--l:#24392d;--t:#ecf7f0;--m:#8fae9b}
+  [data-tema="sihir"]{--bg:#140a0d;--p:#24110f;--b:#33181a;--l:#6b4a2b;--t:#f3e6c4;--m:#c2a77a}
+  [data-tema="sihir"] body{background:
+    radial-gradient(1.2px 1.2px at 25px 40px,#fff9,transparent),radial-gradient(1px 1px at 120px 90px,#fff7,transparent),
+    radial-gradient(1.5px 1.5px at 170px 20px,#ffe9a8,transparent),radial-gradient(1px 1px at 60px 160px,#fff6,transparent),
+    radial-gradient(1px 1px at 190px 140px,#fff8,transparent);background-size:210px 190px;background-color:var(--bg)}
+  [data-tema="sihir"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% -10%,#5c1a22 0%,transparent 60%),radial-gradient(ellipse at 50% 120%,#2a1a05 0%,transparent 55%)}
+  [data-tema="sihir"] h1,[data-tema="sihir"] .k h2,[data-tema="sihir"] nav button,[data-tema="sihir"] .dpad .ok{font-family:Cinzel,Georgia,serif;letter-spacing:.5px}
+  [data-tema="sihir"] h1{color:#e8c66a;text-shadow:0 0 12px #d3a62566}
+  [data-tema="sihir"] .k{background:linear-gradient(160deg,#2c1512,#1d0d0c);border-color:#7a5631;box-shadow:inset 0 0 0 1px #d3a62522,0 6px 24px #0008}
+  [data-tema="sihir"] .k h2{color:#d9b25f}
+  [data-tema="sihir"] button{border-color:#5e3f24}
+  [data-tema="sihir"] .dpad{background:radial-gradient(circle,#3a1d1a,#22100e);border-color:#7a5631;box-shadow:0 0 30px #d3a62522}
+  [data-tema="sihir"] .dpad .ok{background:radial-gradient(circle at 35% 30%,#f6dc8a,#c08a1e 60%,#7a4f0c);color:#2a1406;box-shadow:0 0 18px #d3a62599}
+  [data-tema="sihir"] button.kirmizi{background:linear-gradient(#8e1b24,#5c0f16)}
+  .kivilcim{position:fixed;pointer-events:none;z-index:20;font-size:14px;animation:kiv .8s ease-out forwards}
+  @keyframes kiv{from{opacity:1;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3)}}
   [data-tema="acik"]{--bg:#f2f3f7;--p:#fff;--b:#e7e9f0;--l:#d9dce5;--t:#14161c;--m:#646b7b}
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -817,7 +836,7 @@ $('#mic').onclick = () => {
 };
 
 /* ---------------- görünüm / ayarlar ---------------- */
-const TEMALAR = { gece: 'Gece', oled: 'OLED Siyah', okyanus: 'Okyanus', gunbatimi: 'Gün batımı', orman: 'Orman', acik: 'Açık' };
+const TEMALAR = { sihir: '⚡ Sihir', gece: 'Gece', oled: 'OLED Siyah', okyanus: 'Okyanus', gunbatimi: 'Gün batımı', orman: 'Orman', acik: 'Açık' };
 const VURGULAR = ['#5b8cff', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#06b6d4'];
 function gorunumUygula() {
   const r = document.documentElement;
@@ -843,7 +862,17 @@ function formDoldur() {
   yolGoster();
   $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
 }
-$('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; kaydet(); gorunumUygula(); } };
+$('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; if (A.tema === 'sihir') A.vurgu = '#d3a625'; kaydet(); gorunumUygula(); } };
+// Sihir temasında dokununca kıvılcım
+document.addEventListener('pointerdown', e => {
+  if (A.tema !== 'sihir' || !e.target.closest('button')) return;
+  for (let i = 0; i < 6; i++) {
+    const k = document.createElement('span'); k.className = 'kivilcim'; k.textContent = i % 2 ? '✦' : '✧';
+    const a = Math.random() * Math.PI * 2, m = 25 + Math.random() * 35;
+    k.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;color:${i % 3 ? '#f6dc8a' : '#fff'};--dx:${Math.cos(a) * m}px;--dy:${Math.sin(a) * m}px`;
+    document.body.appendChild(k); setTimeout(() => k.remove(), 850);
+  }
+}, true);
 $('#renkler').onclick = e => { const b = e.target.closest('[data-vurgu]'); if (b) { A.vurgu = b.dataset.vurgu; kaydet(); gorunumUygula(); } };
 $('#aBoyut').oninput = e => { A.boyut = +e.target.value; kaydet(); gorunumUygula(); };
 $('#aKose').oninput = e => { A.kose = +e.target.value; kaydet(); gorunumUygula(); };
