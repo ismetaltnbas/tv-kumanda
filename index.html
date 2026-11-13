@@ -207,7 +207,7 @@
         <button data-k="KEY_ASPECT">▭ En-boy</button>
         <button data-k="KEY_CAPTION">💬 Altyazı</button>
         <button data-k="KEY_SLEEP">🌙 Uyku</button>
-        <button data-k="KEY_AD">🔈 Sesli betim</button>
+        <button data-k="KEY_SOUNDMODE">🔈 Ses modu</button>
       </div>
     </div>
 
@@ -286,13 +286,37 @@
   <section class="sayfa" id="s-ayar">
     <div class="k">
       <h2>Bağlantı</h2>
+      <label>Bağlantı yolu</label>
+      <select id="aYol"><option value="st">SmartThings (önerilen)</option><option value="yerel">Yerel ağ (doğrudan)</option></select>
+      <label>Başlık</label><input id="aBaslik" placeholder="Salon TV">
+      <div class="sw"><span>Açılışta otomatik bağlan</span><input type="checkbox" id="aOto"></div>
+    </div>
+
+    <div class="k" id="stAyar">
+      <h2>SmartThings</h2>
+      <ol class="muted" style="padding-left:18px;margin:0 0 10px">
+        <li>SmartThings uygulamasında monitörün <b>Cihazlar</b> listesinde olduğundan emin ol.</li>
+        <li>Aşağıdaki düğmeye dokun, Samsung hesabınla giriş yap → <b>Generate new token</b>.</li>
+        <li>Ad olarak "Kumanda" yaz, <b>Devices</b> başlığındaki tüm kutuları işaretle → <b>Generate token</b>.</li>
+        <li>Çıkan anahtarı kopyala, aşağıya yapıştır → <b>Kaydet ve cihazları bul</b>.</li>
+      </ol>
+      <a class="btnlink" href="https://account.smartthings.com/tokens" target="_blank" rel="noopener">🔑 SmartThings anahtarı oluştur</a>
+      <label>Erişim anahtarı</label>
+      <input id="aStToken" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div style="height:8px"></div>
+      <button class="a" id="stBul" style="width:100%">Kaydet ve cihazları bul</button>
+      <label>Cihaz</label>
+      <select id="aStCihaz"><option value="">— önce cihazları bul —</option></select>
+      <p class="muted" style="margin-bottom:0">Samsung bu anahtarları 24 saat sonra geçersiz kılıyor. Süresi dolunca kumanda haber verir; aynı sayfadan yenisini oluşturup buraya yapıştırman yeterli.</p>
+    </div>
+
+    <div class="k" id="yerelAyar">
+      <h2>Yerel ağ bağlantısı</h2>
       <label>TV IP adresi</label><input id="aIp" inputmode="decimal" placeholder="192.168.1.102">
       <label>Kumanda adı (TV'de görünür)</label><input id="aAd" placeholder="iPhone Kumanda">
-      <label>Başlık</label><input id="aBaslik" placeholder="Salon TV">
-      <label>Bağlantı yolu</label>
+      <label>Port</label>
       <select id="aPort"><option value="oto">Otomatik</option><option value="8002">Güvenli (8002, sertifika gerekir)</option><option value="8001">Basit (8001, Scriptable ile)</option></select>
       <p class="muted" id="portBilgi" style="margin:6px 0 0"></p>
-      <div class="sw"><span>Açılışta otomatik bağlan</span><input type="checkbox" id="aOto"></div>
       <div class="row" style="margin-top:8px"><button class="a" id="aKaydet">Kaydet & bağlan</button><a id="aSert" class="btnlink" href="https://192.168.1.102:8002/api/v2/" target="_blank" rel="noopener">Sertifikayı kabul et</a></div>
       <p class="muted" style="margin-bottom:0">Açılmazsa bu adresi Safari'nin adres çubuğuna kendin yaz:<br><b id="sertAdres" style="color:var(--t);-webkit-user-select:all;user-select:all">https://192.168.1.102:8002/api/v2/</b></p>
       <p class="muted">İlk kez bağlanırken "Sertifikayı kabul et"e dokun, uyarıda <b>Ayrıntılar → siteyi ziyaret et</b> de, sonra geri dön. TV'de çıkan izin uyarısına <b>İzin ver</b>.</p>
@@ -347,7 +371,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 
 /* ---------------- depolama ---------------- */
 const VARSAYILAN = {
-  ip: '192.168.1.102', port: 'oto', ad: 'iPhone Kumanda', baslik: 'TV Kumanda', oto: true,
+  yol: 'st', stToken: '', stCihaz: '', stCihazAd: '', ip: '192.168.1.102', port: 'oto', ad: 'iPhone Kumanda', baslik: 'TV Kumanda', oto: true,
   tema: 'gece', vurgu: '#5b8cff', boyut: 1, kose: 16, titre: true,
   bolum: { renk: true, numara: true, goruntu: true, hizli: true },
   tokens: {},
@@ -394,7 +418,8 @@ function durum(d) {
 }
 // https sayfası ws:// açamaz (karışık içerik); http'de (örn. Scriptable) 8001 kullanılır
 function portSec() { return A.port !== 'oto' ? A.port : (location.protocol === 'https:' ? '8002' : '8001'); }
-function baglan() {
+function baglan() { return A.yol === 'st' ? stBaglan() : yerelBaglan(); }
+function yerelBaglan() {
   clearTimeout(yenidenT);
   if (ws) { elleKapat = true; try { ws.close(); } catch (e) {} }
   elleKapat = false;
@@ -425,7 +450,7 @@ function baglan() {
   ws.onerror = () => { log('Bağlantı hatası — IP doğru mu, sertifika kabul edildi mi?', 'erc'); };
   ws.onclose = e => {
     bagli = false; durum('off'); log('Bağlantı kapandı (' + e.code + ')');
-    if (!elleKapat && A.oto && document.visibilityState === 'visible') yenidenT = setTimeout(baglan, 4000);
+    if (!elleKapat && A.oto && A.yol !== 'st' && document.visibilityState === 'visible') yenidenT = setTimeout(baglan, 4000);
   };
 }
 function gonder(obj) {
@@ -433,23 +458,137 @@ function gonder(obj) {
   ws.send(JSON.stringify(obj)); return true;
 }
 function tus(k) {
+  if (A.yol === 'st') return stTus(k);
   titre();
   if (gonder({ method: 'ms.remote.control', params: { Cmd: 'Click', DataOfCmd: k, Option: 'false', TypeOfRemote: 'SendRemoteKey' } })) log('→ ' + k);
 }
 function metinGonder(t) {
+  if (A.yol === 'st') { toast('Yazı gönderme SmartThings ile desteklenmiyor'); return; }
   if (gonder({ method: 'ms.remote.control', params: { Cmd: b64(t), DataOfCmd: 'base64', TypeOfRemote: 'SendInputString' } })) log('→ yazı: ' + t, 'okc');
 }
-function metinBitir() { gonder({ method: 'ms.remote.control', params: { TypeOfRemote: 'SendInputEnd' } }); }
+function metinBitir() { if (A.yol === 'st') return; gonder({ method: 'ms.remote.control', params: { TypeOfRemote: 'SendInputEnd' } }); }
 function uygulamaAc(id, ad) {
+  if (A.yol === 'st') { stKomut('custom.launchapp', 'launchApp', [id]).then(ok => ok && toast((ad || id) + ' açılıyor')); return; }
   titre();
   const ok = gonder({ method: 'ms.channel.emit', params: { event: 'ed.apps.launch', to: 'host',
     data: { appId: id, action_type: /^\d+$/.test(id) ? 'DEEP_LINK' : 'NATIVE_LAUNCH' } } });
   if (ok) { log('→ uygulama: ' + (ad || id), 'okc'); toast((ad || id) + ' açılıyor'); }
 }
-function tvUygulamaIste() { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.installedApp.get', to: 'host' } })); }
+function tvUygulamaIste() { if (A.yol === 'st') { $('#tvApps').innerHTML = '<div class="muted" style="grid-column:1/-1">SmartThings yüklü uygulama listesini vermiyor. Favorilerdeki uygulamalar açılabilir; başka bir uygulamayı ID ile elle ekleyebilirsin.</div>'; return; } if (ws && ws.readyState === 1) ws.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.installedApp.get', to: 'host' } })); }
 
 $('#bagBtn').onclick = () => { if (bagli) toast('Zaten bağlı'); else baglan(); };
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && A.oto && !bagli && (!ws || ws.readyState > 1)) baglan(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !A.oto) return;
+  if (A.yol === 'st') { if (A.stToken && A.stCihaz) stDurumOku().catch(() => {}); }
+  else if (!bagli && (!ws || ws.readyState > 1)) baglan();
+});
+
+/* ---------------- SmartThings ---------------- */
+const ST = 'https://api.smartthings.com/v1';
+let stDurum = {};
+async function stIstek(yol, govde) {
+  if (!A.stToken) throw new Error('SmartThings anahtarı girilmedi');
+  let r;
+  try {
+    r = await fetch(ST + yol, { method: govde ? 'POST' : 'GET', headers: { Authorization: 'Bearer ' + A.stToken, 'Content-Type': 'application/json' }, body: govde ? JSON.stringify(govde) : undefined });
+  } catch (e) { throw new Error('SmartThings\'e ulaşılamadı (internet bağlantısını kontrol et)'); }
+  if (r.status === 401) { bagli = false; durum('off'); throw new Error('Anahtar geçersiz ya da süresi dolmuş — Ayarlar\'dan yenisini yapıştır'); }
+  if (r.status === 403) throw new Error('Anahtarın bu cihaza izni yok — anahtarı oluştururken Devices kutularını işaretle');
+  if (r.status === 429) throw new Error('Çok hızlı komut gönderildi, biraz bekle');
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((j.error && (j.error.message || j.error.code)) || ('HTTP ' + r.status));
+  return j;
+}
+async function stKomut(capability, command, args = []) {
+  if (!A.stCihaz) { toast('Ayarlar\'dan SmartThings cihazını seç'); return false; }
+  titre();
+  try {
+    await stIstek(`/devices/${A.stCihaz}/commands`, { commands: [{ component: 'main', capability, command, arguments: args }] });
+    log('→ ' + capability + '.' + command + (args.length ? ' ' + args.join(', ') : ''));
+    if (!bagli) { bagli = true; durum('on'); }
+    return true;
+  } catch (e) { log('SmartThings: ' + e.message, 'erc'); toast(e.message); return false; }
+}
+async function stDurumOku() {
+  const j = await stIstek(`/devices/${A.stCihaz}/status`);
+  stDurum = (j.components && j.components.main) || {};
+  return stDurum;
+}
+const dv = (cap, attr) => { const c = stDurum[cap]; return c && c[attr] ? c[attr].value : undefined; };
+async function stBaglan() {
+  if (!A.stToken || !A.stCihaz) { durum('off'); toast('Ayarlar → SmartThings bölümünü doldur'); git('ayar'); return; }
+  durum('bek'); log('SmartThings\'e bağlanılıyor…');
+  try {
+    await stDurumOku(); bagli = true; durum('on');
+    log('SmartThings bağlandı ✓ — ' + (A.stCihazAd || 'cihaz') + ' ' + (dv('switch', 'switch') === 'off' ? '(kapalı)' : '(açık)'), 'okc');
+    toast('SmartThings ile bağlandı'); tvUygulamaIste();
+  } catch (e) { bagli = false; durum('off'); log('SmartThings: ' + e.message, 'erc'); toast(e.message); }
+}
+const ST_YON = { KEY_UP: 'UP', KEY_DOWN: 'DOWN', KEY_LEFT: 'LEFT', KEY_RIGHT: 'RIGHT', KEY_ENTER: 'OK', KEY_RETURN: 'BACK', KEY_MENU: 'MENU', KEY_HOME: 'HOME' };
+const ST_SABIT = {
+  KEY_VOLUP: ['audioVolume', 'volumeUp'], KEY_VOLDOWN: ['audioVolume', 'volumeDown'],
+  KEY_CHUP: ['tvChannel', 'channelUp'], KEY_CHDOWN: ['tvChannel', 'channelDown'],
+  KEY_PLAY: ['mediaPlayback', 'play'], KEY_PAUSE: ['mediaPlayback', 'pause'], KEY_STOP: ['mediaPlayback', 'stop'],
+  KEY_FF: ['mediaPlayback', 'fastForward'], KEY_REWIND: ['mediaPlayback', 'rewind'],
+};
+let stRakam = '', stRakamT;
+function stKanal() { const c = stRakam; stRakam = ''; if (c) stKomut('tvChannel', 'setTvChannel', [c]).then(ok => ok && toast('Kanal ' + c)); }
+async function stDongu(cap, listeAttr, simdiAttr, komut, ad) {
+  try { await stDurumOku(); } catch (e) {}
+  const l = dv(cap, listeAttr) || [];
+  if (!l.length) return toast(ad + ' bu cihazda SmartThings ile değiştirilemiyor');
+  const y = l[(l.indexOf(dv(cap, simdiAttr)) + 1) % l.length];
+  if (await stKomut(cap, komut, [y])) toast(ad + ': ' + y);
+}
+async function stKaynak() {
+  try { await stDurumOku(); } catch (e) {}
+  const m = dv('samsungvd.mediaInputSource', 'supportedInputSourcesMap');
+  if (m && m.length) {
+    const i = m.findIndex(x => x.id === dv('samsungvd.mediaInputSource', 'inputSource'));
+    const y = m[(i + 1) % m.length];
+    if (await stKomut('samsungvd.mediaInputSource', 'setInputSource', [y.id])) toast('Kaynak: ' + (y.name || y.id));
+    return;
+  }
+  return stDongu('mediaInputSource', 'supportedInputSources', 'inputSource', 'setInputSource', 'Kaynak');
+}
+async function stTus(k) {
+  if (k === 'KEY_ENTER' && stRakam) { clearTimeout(stRakamT); return stKanal(); }
+  if (/^KEY_\d$/.test(k)) { stRakam += k.slice(4); toast('Kanal: ' + stRakam); clearTimeout(stRakamT); stRakamT = setTimeout(stKanal, 1500); return; }
+  if (ST_YON[k]) return stKomut('samsungvd.remoteControl', 'send', [ST_YON[k], 'PRESS_AND_RELEASED']);
+  if (ST_SABIT[k]) return stKomut(...ST_SABIT[k]);
+  if (k === 'KEY_POWER') {
+    try { await stDurumOku(); } catch (e) {}
+    const acik = dv('switch', 'switch') !== 'off';
+    if (await stKomut('switch', acik ? 'off' : 'on')) toast(acik ? 'Kapatılıyor' : 'Açılıyor');
+    return;
+  }
+  if (k === 'KEY_MUTE') {
+    const m = dv('audioMute', 'mute') === 'muted';
+    if (await stKomut('audioMute', m ? 'unmute' : 'mute')) stDurum.audioMute = { mute: { value: m ? 'unmuted' : 'muted' } };
+    return;
+  }
+  if (k === 'KEY_PMODE') return stDongu('custom.picturemode', 'supportedPictureModes', 'pictureMode', 'setPictureMode', 'Resim modu');
+  if (k === 'KEY_SOUNDMODE') return stDongu('custom.soundmode', 'supportedSoundModes', 'soundMode', 'setSoundMode', 'Ses modu');
+  if (k === 'KEY_SOURCE') return stKaynak();
+  toast('Bu tuş SmartThings ile desteklenmiyor');
+}
+async function stCihazBul() {
+  A.stToken = $('#aStToken').value.trim(); kaydet();
+  if (!A.stToken) return toast('Önce anahtarı yapıştır');
+  $('#stBul').textContent = 'Aranıyor…';
+  try {
+    const j = await stIstek('/devices');
+    const hepsi = (j.items || []).map(d => ({ id: d.deviceId, ad: d.label || d.name, tv: /samsungvd|tvChannel|audioVolume|custom\.launchapp/.test(JSON.stringify(d.components || [])) }));
+    const tvler = hepsi.filter(d => d.tv); const liste = tvler.length ? tvler : hepsi;
+    if (!liste.length) { toast('Hesapta cihaz bulunamadı'); log('SmartThings: cihaz yok — monitörü SmartThings uygulamasına ekle', 'erc'); return; }
+    $('#aStCihaz').innerHTML = liste.map(d => `<option value="${esc(d.id)}">${esc(d.ad)}</option>`).join('');
+    const sec = liste.find(d => d.id === A.stCihaz) || liste[0];
+    $('#aStCihaz').value = sec.id; A.stCihaz = sec.id; A.stCihazAd = sec.ad; kaydet();
+    log(liste.length + ' cihaz bulundu, seçilen: ' + sec.ad, 'okc');
+    stBaglan();
+  } catch (e) { log('SmartThings: ' + e.message, 'erc'); toast(e.message); }
+  finally { $('#stBul').textContent = 'Kaydet ve cihazları bul'; }
+}
 
 /* ---------------- tuşlar (basılı tutunca tekrar) ---------------- */
 document.addEventListener('pointerdown', e => {
@@ -458,7 +597,7 @@ document.addEventListener('pointerdown', e => {
   b.classList.add('bas');
   tus(b.dataset.k);
   if (b.hasAttribute('data-r')) {
-    let iv; const t = setTimeout(() => { iv = setInterval(() => tus(b.dataset.k), 130); }, 400);
+    let iv; const t = setTimeout(() => { iv = setInterval(() => tus(b.dataset.k), A.yol === 'st' ? 450 : 130); }, 400);
     const bit = () => { clearTimeout(t); clearInterval(iv); b.classList.remove('bas'); ['pointerup', 'pointercancel', 'pointerleave'].forEach(x => b.removeEventListener(x, bit)); };
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(x => b.addEventListener(x, bit));
   } else {
@@ -699,6 +838,9 @@ function gorunumUygula() {
 function formDoldur() {
   $('#aIp').value = A.ip; $('#aAd').value = A.ad; $('#aBaslik').value = A.baslik; $('#aOto').checked = A.oto;
   $('#aBoyut').value = A.boyut; $('#aKose').value = A.kose; $('#aTitre').checked = A.titre; $('#aPort').value = A.port; sertGuncelle(); portBilgi();
+  $('#aYol').value = A.yol; $('#aStToken').value = A.stToken;
+  if (A.stCihaz) $('#aStCihaz').innerHTML = `<option value="${esc(A.stCihaz)}">${esc(A.stCihazAd || A.stCihaz)}</option>`;
+  yolGoster();
   $$('[data-b]').forEach(c => c.checked = !!A.bolum[c.dataset.b]);
 }
 $('#temalar').onclick = e => { const b = e.target.closest('[data-tema]'); if (b) { A.tema = b.dataset.tema; kaydet(); gorunumUygula(); } };
@@ -710,7 +852,17 @@ function portBilgi() {
   const p = portSec();
   $('#portBilgi').textContent = 'Şu an kullanılan: ' + p + (p === '8001' && location.protocol === 'https:' ? ' — ⚠️ bu sayfa https olduğu için 8001 engellenir; Scriptable ile aç.' : '');
 }
+function yolGoster() { $('#stAyar').classList.toggle('gizli', A.yol !== 'st'); $('#yerelAyar').classList.toggle('gizli', A.yol === 'st'); }
+$('#aYol').onchange = e => {
+  A.yol = e.target.value; kaydet(); yolGoster(); bagli = false; durum('off');
+  if (ws) { elleKapat = true; try { ws.close(); } catch (x) {} }
+  if (A.yol === 'st' ? (A.stToken && A.stCihaz) : true) baglan();
+};
+$('#stBul').onclick = stCihazBul;
+$('#aStToken').onchange = e => { A.stToken = e.target.value.trim(); kaydet(); };
+$('#aStCihaz').onchange = e => { A.stCihaz = e.target.value; A.stCihazAd = e.target.selectedOptions[0].textContent; kaydet(); stBaglan(); };
 $('#aPort').onchange = e => { A.port = e.target.value; kaydet(); portBilgi(); baglan(); };
+$('#aBaslik').onchange = e => { A.baslik = e.target.value.trim() || VARSAYILAN.baslik; kaydet(); gorunumUygula(); };
 $('#aOto').onchange = e => { A.oto = e.target.checked; kaydet(); };
 $$('[data-b]').forEach(c => c.onchange = () => { A.bolum[c.dataset.b] = c.checked; kaydet(); gorunumUygula(); });
 $('#aKaydet').onclick = () => {
@@ -721,22 +873,23 @@ function sertGuncelle() { const u = `https://${$('#aIp').value.trim() || A.ip}:8
 $('#aIp').addEventListener('input', sertGuncelle);
 $('#aToken').onclick = () => { delete A.tokens[A.ip]; try { localStorage.removeItem('tvtoken'); } catch (e) {} kaydet(); toast('İzin sıfırlandı; yeniden bağlanınca TV tekrar soracak'); };
 $('#disa').onclick = async () => {
-  const j = JSON.stringify({ ...A, tokens: undefined });
+  const j = JSON.stringify({ ...A, tokens: undefined, stToken: undefined });
   try { await navigator.clipboard.writeText(j); toast('Panoya kopyalandı'); } catch (e) { prompt('Kopyala:', j); }
 };
 $('#ice').onclick = () => {
   const j = prompt('Kopyaladığın ayar metnini yapıştır:'); if (!j) return;
-  try { const y = JSON.parse(j); const tok = A.tokens; A = Object.assign(structuredClone(VARSAYILAN), y, { tokens: tok }); kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Ayarlar yüklendi'); }
+  try { const y = JSON.parse(j); const tok = A.tokens; A = Object.assign(structuredClone(VARSAYILAN), y, { tokens: tok, stToken: A.stToken }); kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Ayarlar yüklendi'); }
   catch (e) { toast('Geçersiz metin'); }
 };
 $('#sifirla').onclick = () => {
   if (!confirm('Tema, favoriler ve makrolar varsayılana dönsün mü? (TV izni korunur)')) return;
-  const tok = A.tokens; A = structuredClone(VARSAYILAN); A.tokens = tok; kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Sıfırlandı');
+  const tok = A.tokens; const stt = A.stToken; A = structuredClone(VARSAYILAN); A.tokens = tok; A.stToken = stt; kaydet(); formDoldur(); gorunumUygula(); favCiz(); makroCiz(); toast('Sıfırlandı');
 };
 
 /* ---------------- başlat ---------------- */
 gorunumUygula(); formDoldur(); favCiz(); makroCiz();
-if (A.oto) baglan();
+if (A.oto && (A.yol !== 'st' || (A.stToken && A.stCihaz))) baglan();
+else if (A.yol === 'st' && !(A.stToken && A.stCihaz)) { git('ayar'); log('İlk kurulum: Ayarlar → SmartThings bölümünü doldur'); }
 </script>
 </body>
 </html>
